@@ -1,0 +1,272 @@
+[
+  {
+    "type": "multiple_choice",
+    "text": "Qual estrutura de dados utiliza o princípio LIFO (Last In, First Out)?",
+    "options": [
+      "Fila",
+      "Pilha",
+      "Árvore binária",
+      "Grafo"
+    ],
+    "correctIndex": 1,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Qual das alternativas representa corretamente a complexidade do algoritmo de busca binária?",
+    "options": [
+      "O(n)",
+      "O(n²)",
+      "O(log n)",
+      "O(1)"
+    ],
+    "correctIndex": 2,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Em qual camada do modelo OSI o endereçamento IP é tratado?",
+    "options": [
+      "Camada de Enlace",
+      "Camada de Rede",
+      "Camada de Transporte",
+      "Camada de Aplicação"
+    ],
+    "correctIndex": 1,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "O que é um sistema operacional?",
+    "options": [
+      "Um programa que edita textos",
+      "Um hardware responsável pelo processamento",
+      "Um software que gerencia recursos de hardware e fornece serviços aos programas",
+      "Um protocolo de comunicação em rede"
+    ],
+    "correctIndex": 2,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Qual porta TCP é usada por padrão pelo protocolo HTTP?",
+    "options": [
+      "21",
+      "443",
+      "80",
+      "22"
+    ],
+    "correctIndex": 2,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "true_false",
+    "text": "A memória RAM é um tipo de memória volátil, ou seja, perde seus dados quando o computador é desligado.",
+    "correctAnswer": true,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "true_false",
+    "text": "Em lógica booleana, a operação AND retorna verdadeiro quando pelo menos um dos operandos é verdadeiro.",
+    "correctAnswer": false,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "true_false",
+    "text": "O protocolo TCP garante a entrega ordenada e confiável dos dados, ao contrário do UDP.",
+    "correctAnswer": true,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "true_false",
+    "text": "Em programação orientada a objetos, herança permite que uma classe filha reutilize atributos e métodos de uma classe pai.",
+    "correctAnswer": true,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "true_false",
+    "text": "Um compilador traduz o código-fonte de um programa e o executa linha por linha, simultaneamente.",
+    "correctAnswer": false,
+    "difficulty": "EASY"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Qual algoritmo de ordenação possui complexidade O(n log n) no pior caso?",
+    "options": [
+      "Quick Sort",
+      "Bubble Sort",
+      "Merge Sort",
+      "Insertion Sort"
+    ],
+    "correctIndex": 2,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Em um banco de dados relacional, o que garante que uma coluna em uma tabela referencie corretamente um registro existente em outra tabela?",
+    "options": [
+      "Chave primária",
+      "Índice",
+      "Chave estrangeira",
+      "Constraint NOT NULL"
+    ],
+    "correctIndex": 2,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Qual é o resultado da operação binária 1010 XOR 1100?",
+    "options": [
+      "1110",
+      "0110",
+      "1000",
+      "0010"
+    ],
+    "correctIndex": 1,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "No contexto de gerenciamento de memória, o que é um 'deadlock'?",
+    "options": [
+      "Quando um processo consome toda a memória RAM disponível",
+      "Quando dois ou mais processos ficam bloqueados esperando recursos que o outro detém",
+      "Quando o sistema operacional encerra um processo por falta de memória",
+      "Quando um ponteiro referencia um endereço de memória inválido"
+    ],
+    "correctIndex": 1,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Qual paradigma de programação trata funções como cidadãs de primeira classe e evita mudança de estado e dados mutáveis?",
+    "options": [
+      "Orientado a objetos",
+      "Imperativo",
+      "Funcional",
+      "Procedural"
+    ],
+    "correctIndex": 2,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "true_false",
+    "text": "Na notação Big-O, O(n²) é mais eficiente que O(n log n) para grandes entradas.",
+    "correctAnswer": false,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "true_false",
+    "text": "O padrão de projeto Singleton garante que uma classe tenha apenas uma instância durante toda a execução do programa.",
+    "correctAnswer": true,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "true_false",
+    "text": "Em redes de computadores, o protocolo ARP é responsável por mapear endereços IP em endereços MAC.",
+    "correctAnswer": true,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "true_false",
+    "text": "Uma árvore binária de busca (BST) balanceada garante complexidade O(log n) para inserção e busca no pior caso, mesmo sem nenhum mecanismo adicional de balanceamento.",
+    "correctAnswer": false,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "true_false",
+    "text": "O conceito de polimorfismo em orientação a objetos permite que um mesmo método se comporte de formas diferentes dependendo do objeto que o invoca.",
+    "correctAnswer": true,
+    "difficulty": "MEDIUM"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Em um sistema com paginação de memória, qual problema ocorre quando um processo acessa uma página que não está carregada na memória física?",
+    "options": [
+      "Buffer overflow",
+      "Page fault",
+      "Segmentation fault",
+      "Cache miss"
+    ],
+    "correctIndex": 1,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Qual das seguintes afirmações descreve corretamente o Teorema CAP em sistemas distribuídos?",
+    "options": [
+      "Um sistema distribuído pode garantir simultaneamente Consistência, Disponibilidade e Tolerância a Partições",
+      "Um sistema distribuído pode garantir no máximo duas das três propriedades: Consistência, Disponibilidade e Tolerância a Partições",
+      "Consistência e Disponibilidade são sempre sacrificadas em favor da Tolerância a Partições",
+      "O Teorema CAP se aplica apenas a bancos de dados relacionais"
+    ],
+    "correctIndex": 1,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Na arquitetura RISC-V, o que diferencia instruções do tipo R das do tipo I?",
+    "options": [
+      "Instruções tipo R operam apenas com memória; tipo I operam com registradores",
+      "Instruções tipo R utilizam três registradores como operandos; tipo I utilizam dois registradores e um imediato",
+      "Instruções tipo R são de 16 bits; tipo I são de 32 bits",
+      "Instruções tipo R são exclusivas para operações de ponto flutuante"
+    ],
+    "correctIndex": 1,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Qual técnica de sincronização garante exclusão mútua sem utilizar espera ocupada (busy waiting)?",
+    "options": [
+      "Spinlock",
+      "Variável de condição com mutex",
+      "Test-and-Set",
+      "Polling"
+    ],
+    "correctIndex": 1,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "multiple_choice",
+    "text": "Considerando a complexidade de tempo, qual é o limite inferior teórico (lower bound) para algoritmos de ordenação baseados em comparação?",
+    "options": [
+      "O(n)",
+      "O(n log n)",
+      "O(log n)",
+      "O(n²)"
+    ],
+    "correctIndex": 1,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "true_false",
+    "text": "Em compiladores, a análise semântica é responsável por verificar se a estrutura sintática do código-fonte está correta, como o balanceamento de chaves e parênteses.",
+    "correctAnswer": false,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "true_false",
+    "text": "O algoritmo de Dijkstra falha ao encontrar o caminho mínimo em grafos que possuem arestas com peso negativo.",
+    "correctAnswer": true,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "true_false",
+    "text": "Em criptografia assimétrica, uma mensagem cifrada com a chave pública de um destinatário só pode ser decifrada com a chave privada correspondente desse mesmo destinatário.",
+    "correctAnswer": true,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "true_false",
+    "text": "O escalonamento Round-Robin com quantum infinito se comporta de forma equivalente ao escalonamento FCFS (First Come, First Served).",
+    "correctAnswer": true,
+    "difficulty": "HARD"
+  },
+  {
+    "type": "true_false",
+    "text": "Em redes neurais profundas, o problema de vanishing gradient ocorre predominantemente nas camadas iniciais da rede e é agravado pelo uso da função de ativação ReLU.",
+    "correctAnswer": false,
+    "difficulty": "HARD"
+  }
+]
