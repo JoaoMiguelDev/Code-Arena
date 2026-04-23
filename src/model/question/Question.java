@@ -12,6 +12,14 @@ public abstract class Question {
         this.Difficulty = difficulty;
     }
 
+    public Difficulty getDifficulty() {
+        return Difficulty;
+    }
+
+    public String getCorrectAnswer() {
+        return CorrectAnswer;
+    }
+
     public abstract void DisplayQuestion();
     public abstract boolean CheckAnswer(String answer);
     public abstract List<String> GetAvailableAnswers();
