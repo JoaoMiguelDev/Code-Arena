@@ -34,6 +34,7 @@ public class Round {
     private void DisplayInfo(){
         System.out.println("\n" + "=".repeat(50));
         System.out.println("⚔️ ROUND " + RoundNumber + " ⚔️");
+        System.out.println("Question difficulty: " + RoundQuestion.getDifficulty());
         System.out.println("=".repeat(50));
 
         System.out.println("YOU: " + Player.getName());

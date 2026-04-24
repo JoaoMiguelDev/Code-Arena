@@ -4,13 +4,14 @@ package model.question;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QuestionBank {
     private List<Question> questions;
 
     public QuestionBank() {
         this.questions = new ArrayList<>();
-        InitializeQuestions();  // Carrega perguntas hardcoded
+        InitializeQuestions();
     }
 
     private void InitializeQuestions(){
@@ -221,5 +222,11 @@ public class QuestionBank {
         questions.add(new TrueFalseQuestion(
                 "Em redes neurais profundas, o problema de vanishing gradient ocorre predominantemente nas camadas iniciais da rede e é agravado pelo uso da função de ativação ReLU.",
                 false, Difficulty.HARD));
+    }
+
+    public List<Question> FilterByDifficulty(Difficulty difficulty){
+//        List<Question> FilteredQuestions = questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList());
+//        return FilteredQuestions;
+        return questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList()); //this way has support to older Java Versions
     }
 }
