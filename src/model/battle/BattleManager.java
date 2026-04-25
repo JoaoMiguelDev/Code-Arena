@@ -63,17 +63,11 @@ public class BattleManager {
     }
 
     public void DisplayIntro(){
-        System.out.println("YOU: " + Player.getName());
-        System.out.println("Health: " + Player.getHealth());
-        System.out.println("Damage" + Player.getDamage());
-        System.out.println("Speed: " + Player.getSpeed());
+        Player.DisplayCharacterInfo();
 
         System.out.println("─".repeat(50));
 
-        System.out.println("ENEMY: " + Enemy.getName());
-        System.out.println("Health: " + Enemy.getHealth());
-        System.out.println("Damage" + Enemy.getDamage());
-        System.out.println("Speed: " + Enemy.getSpeed());
+        Enemy.DisplayCharacterInfo();
 
         System.out.println("─".repeat(50));
     }
@@ -93,10 +87,10 @@ public class BattleManager {
     }
 
     private void CheckBattleEnd(){
-        if(Player.getHealth() <= 0){
+        if(!Player.isAlive()){
             battleStatus = BattleStatus.ENEMY_WON;
             System.out.println("\nYOU LOST!");
-        } else if (Enemy.getHealth() <= 0) {
+        } else if (!Enemy.isAlive()) {
             battleStatus = BattleStatus.PLAYER_WON;
             System.out.println("\nYOU WON!");
         }
