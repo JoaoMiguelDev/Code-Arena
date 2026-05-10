@@ -1,14 +1,13 @@
 # CodeArena: Batalha do Conhecimento
 
 **CodeArena** é um jogo educacional onde você enfrenta oponentes em batalhas de perguntas e respostas.  
-Cada rodada testa seus conhecimentos, e suas respostas definem os rumos da luta: acertar causa dano no adversário, errar pode te custar energia.
+Cada rodada testa seus conhecimentos, e suas respostas definem os rumos da luta: acertar causa dano no adversário.
 
 ## 🎮 Como funciona
 
 - Você escolhe um personagem com características únicas.
-- Em cada rodada, uma pergunta aparece (múltipla escolha, verdadeiro/falso, etc.).
+- Em cada rodada, uma pergunta aparece (múltipla escolha ou verdadeiro/falso).
 - Ao acertar, você ataca o inimigo.
-- Ao errar, sofre uma penalidade.
 - O combate continua até que alguém fique sem vida.
 - Conforme avança, os desafios ficam mais difíceis e novos oponentes surgem.
 
@@ -16,15 +15,15 @@ Cada rodada testa seus conhecimentos, e suas respostas definem os rumos da luta:
 
 Durante a batalha, é possível usar habilidades que ajudam a virar o jogo, como:
 - Remover alternativas erradas
-- Dobrar o dano do próximo acerto
-- Criar um escudo temporário
+- Escolher dificuldade da pergunta
+- Dar dano mesmo errando a pergunta
 - Recuperar vida
 
 ## 🧪 Temas e perguntas
 
-O jogo pode ser adaptado para qualquer tema:  
-computação, ciência, história, sustentabilidade, cultura geral, entre outros.  
-As perguntas são organizadas por dificuldade e categoria.
+O jogo conta com perguntas de diversas área da compuação, como:  
+redes, algoritmos e estrutura de dados, LPOO, Sistemas operacionais, entre outros.  
+As perguntas são organizadas por dificuldade.
 
 ## 🕹️ Progressão
 
