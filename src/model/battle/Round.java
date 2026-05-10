@@ -33,7 +33,7 @@ public class Round {
 
     private void DisplayInfo(){
         System.out.println("\n" + "=".repeat(50));
-        System.out.println("⚔️ ROUND " + RoundNumber + " ⚔️");
+        System.out.println("ROUND " + RoundNumber);
         System.out.println("Question difficulty: " + RoundQuestion.getDifficulty());
         System.out.println("=".repeat(50));
 
@@ -62,8 +62,8 @@ public class Round {
         if(playerMoveFirst){
           PlayerTurn(scanner);
 
-//        if (!enemy.isAlive()) {
-//           return true;           //Not Implemented yet this is NOT final
+//        if (!Enemy.IsAlive()) {
+//            return true;
 //        }
 
           BotTurn();
@@ -74,7 +74,7 @@ public class Round {
     }
 
     private void PlayerTurn(Scanner scanner){
-        System.out.println("=".repeat(50));
+        System.out.println("\n" + "─".repeat(50));
         System.out.println("YOUR TURN");
         System.out.println("=".repeat(50));
 
@@ -86,20 +86,20 @@ public class Round {
 
         if(PlayerWasCorrect){
             int damage = CalculateBaseDamage(Player);
-            //Enemy.TakeDamage(damage);
+            Enemy.TakeDamage(damage);
             System.out.println("\n" + "─".repeat(50));
 
-            System.out.println("✅ RESULTADO: ACERTOU!");
-            System.out.println("📖 Resposta: " + RoundQuestion.getCorrectAnswer());
-            System.out.printf("⚔️ Dano causado ao inimigo: " + damage);
+            System.out.println("RESULTADO: ACERTOU!");
+            System.out.println("Resposta: " + RoundQuestion.getCorrectAnswer());
+            System.out.printf("Dano causado ao inimigo: " + damage);
 
-            System.out.println("─".repeat(50));
+            System.out.println("\n" + "─".repeat(50));
         } else {
             System.out.println("\n" + "─".repeat(50));
 
-            System.out.println("❌ RESULTADO: ERROU!");
-            System.out.println("📖 Resposta correta: " + RoundQuestion.getCorrectAnswer());
-            System.out.println("💔 Sua resposta: " + PlayerAnswer);
+            System.out.println("RESULTADO: ERROU!");
+            System.out.println("Resposta correta: " + RoundQuestion.getCorrectAnswer());
+            System.out.println("Sua resposta: " + PlayerAnswer);
 
             System.out.println("─".repeat(50));
         }
@@ -107,7 +107,7 @@ public class Round {
     }
 
     private void BotTurn(){
-        System.out.println("=".repeat(50));
+        System.out.println("\n" + "─".repeat(50));
         System.out.println("BOT TURN");
         System.out.println("=".repeat(50));
 
@@ -116,18 +116,18 @@ public class Round {
         if(botAnswerer.getBotAnswer(RoundQuestion, Enemy)){
             int damage = CalculateBaseDamage(Enemy);
 
-            //Player.TakeDamage(damage);
+            Player.TakeDamage(damage);
 
             System.out.println("\n" + "─".repeat(50));
 
-            System.out.println("✅ RESULTADO: ACERTOU!");
-            System.out.printf("⚔️ Dano causado à você: " + damage);
+            System.out.println("RESULTADO: ACERTOU!");
+            System.out.printf("Dano causado à você: " + damage);
 
-            System.out.println("─".repeat(50));
+            System.out.println("\n" + "─".repeat(50));
         } else {
             System.out.println("\n" + "─".repeat(50));
 
-            System.out.println("❌ RESULTADO: ERROU!");
+            System.out.println("RESULTADO: ERROU!");
 
             System.out.println("─".repeat(50));
         }

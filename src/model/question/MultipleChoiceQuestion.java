@@ -14,14 +14,14 @@ public class MultipleChoiceQuestion extends Question {
 
     @Override
     public void DisplayQuestion() {
-        System.out.println("\n📚 " + Text);
+        System.out.println("\n" + Text);
         System.out.println("─────────────────────────────────");
         for (int i = 0; i < Options.size(); i++) {
             char letter = (char) ('A' + i);
             System.out.println("   " + letter + ") " + Options.get(i));
         }
         System.out.println("─────────────────────────────────");
-        System.out.print("👉 Sua resposta (A, B, C, D): ");
+        System.out.print("Sua resposta (A, B, C, D): ");
     }
 
     @Override

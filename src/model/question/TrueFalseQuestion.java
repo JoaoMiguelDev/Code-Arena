@@ -13,12 +13,12 @@ public class TrueFalseQuestion extends Question {
 
     @Override
     public void DisplayQuestion() {
-        System.out.println("\n📚 " + Text);
+        System.out.println("\n" + Text);
         System.out.println("─────────────────────────────────");
         System.out.println("   A) Verdadeiro");
         System.out.println("   B) Falso");
         System.out.println("─────────────────────────────────");
-        System.out.print("👉 Sua resposta (A ou B): ");
+        System.out.print("Sua resposta (A ou B): ");
     }
 
     @Override

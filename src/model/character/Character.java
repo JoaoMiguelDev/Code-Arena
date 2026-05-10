@@ -1,10 +1,17 @@
 package model.character;
 
 public abstract class Character {
-    private String Name;
-    private int Health;
-    private int Damage;
-    private int Speed;
+    protected String Name;
+    protected int Health;
+    protected int Damage;
+    protected int Speed;
+
+    public Character(String name, int health, int damage, int speed){
+        this.Name = name;
+        this.Health = health;
+        this.Damage = damage;
+        this.Speed = speed;
+    }
 
     public String getName() {
         return Name;
@@ -21,4 +28,14 @@ public abstract class Character {
     public int getDamage() {
         return Damage;
     }
+
+    public void TakeDamage(int damage){
+        Health -= Damage;
+    }
+
+    public boolean IsAlive(){
+        return Health >= 0;
+    }
+
+    public abstract void HealCharacter();
 }

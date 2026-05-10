@@ -35,7 +35,7 @@ public class BattleManager {
 
     public void ExecuteBattle(Scanner scanner){
         System.out.println("\n" + "─".repeat(50));
-        System.out.println("⚔️ A BATALHA " + BattleNumber + " COMEÇOU! ⚔️");
+        System.out.println("A BATALHA " + BattleNumber + " COMEÇOU!");
         System.out.println("─".repeat(50));
 
         DisplayIntro();
@@ -62,23 +62,23 @@ public class BattleManager {
 
     }
 
-    public void DisplayIntro(){
+    private void DisplayIntro(){
         System.out.println("YOU: " + Player.getName());
         System.out.println("Health: " + Player.getHealth());
-        System.out.println("Damage" + Player.getDamage());
+        System.out.println("Damage: " + Player.getDamage());
         System.out.println("Speed: " + Player.getSpeed());
 
         System.out.println("─".repeat(50));
 
         System.out.println("ENEMY: " + Enemy.getName());
         System.out.println("Health: " + Enemy.getHealth());
-        System.out.println("Damage" + Enemy.getDamage());
+        System.out.println("Damage: " + Enemy.getDamage());
         System.out.println("Speed: " + Enemy.getSpeed());
 
         System.out.println("─".repeat(50));
     }
 
-    public void DisplayRoundResult(){
+    private void DisplayRoundResult(){
         System.out.println("─".repeat(50));
 
         System.out.println("YOU: " + Player.getName());
@@ -102,4 +102,7 @@ public class BattleManager {
         }
     }
 
+    public BattleStatus getBattleStatus() {
+        return battleStatus;
+    }
 }
