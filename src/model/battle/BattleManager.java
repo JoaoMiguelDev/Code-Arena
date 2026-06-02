@@ -1,6 +1,7 @@
 package model.battle;
 
 import model.character.Character;
+import model.character.FortuneTeller;
 import model.question.Difficulty;
 import model.question.Question;
 import model.question.QuestionBank;
@@ -35,17 +36,33 @@ public class BattleManager {
 
     public void ExecuteBattle(Scanner scanner){
         System.out.println("\n" + "─".repeat(50));
-        System.out.println("⚔️ A BATALHA " + BattleNumber + " COMEÇOU! ⚔️");
+        System.out.println("A BATALHA " + BattleNumber + " COMEÇOU!");
         System.out.println("─".repeat(50));
 
         DisplayIntro();
 
-        while(battleStatus == BattleStatus.ONGOING){
-            try{
-                Question tryGetQuestion = BattleQuestions.get(RoundIndex);
-            } catch (IndexOutOfBoundsException e){
+        while (battleStatus == BattleStatus.ONGOING) {
+
+            // Se for a Cartomante, ela escolhe a dificuldade da rodada atual de forma dinâmica
+            if (Player instanceof FortuneTeller) {
+                System.out.println("\n[Cartomante] Escolha a dificuldade da próxima pergunta:");
+                System.out.println("1 - EASY | 2 - MEDIUM | 3 - HARD");
+                System.out.print("Opção: ");
+                String choice = scanner.nextLine().trim();
+
+                Difficulty chosenDifficulty = switch (choice) {
+                    case "2" -> Difficulty.MEDIUM;
+                    case "3" -> Difficulty.HARD;
+                    default -> Difficulty.EASY;
+                };
+
+                this.PrepareQuestions(chosenDifficulty);
                 RoundIndex = 0;
-                Collections.shuffle(BattleQuestions);
+            } else {
+                if (RoundIndex >= BattleQuestions.size()) {
+                    RoundIndex = 0;
+                    Collections.shuffle(BattleQuestions);
+                }
             }
 
             Question CurrentQuestion = BattleQuestions.get(RoundIndex);
@@ -53,12 +70,11 @@ public class BattleManager {
             round.ExecuteRound(scanner);
             DisplayRoundResult();
 
-            RoundIndex ++;
-            RoundNumber ++;
+            RoundIndex++;
+            RoundNumber++;
 
             CheckBattleEnd();
         }
-
 
     }
 
@@ -72,28 +88,31 @@ public class BattleManager {
         System.out.println("─".repeat(50));
     }
 
-    public void DisplayRoundResult(){
+    private void DisplayRoundResult(){
         System.out.println("─".repeat(50));
 
-        System.out.println("YOU: " + Player.getName());
-        System.out.println("Health: " + Player.getHealth());
+        System.out.println("VOCÊ: " + Player.getName());
+        System.out.println("Vida: " + Player.getHealth());
 
         System.out.println("─".repeat(50));
 
-        System.out.println("ENEMY: " + Enemy.getName());
-        System.out.println("Health: " + Enemy.getHealth());
+        System.out.println("INIMIGO: " + Enemy.getName());
+        System.out.println("Vida: " + Enemy.getHealth());
 
         System.out.println("─".repeat(50));
     }
 
     private void CheckBattleEnd(){
-        if(!Player.isAlive()){
+        if(!Player.IsAlive()){
             battleStatus = BattleStatus.ENEMY_WON;
-            System.out.println("\nYOU LOST!");
-        } else if (!Enemy.isAlive()) {
+            System.out.println("\nVOCÊ PERDEU!");
+        } else if (!Enemy.IsAlive()) {
             battleStatus = BattleStatus.PLAYER_WON;
-            System.out.println("\nYOU WON!");
+            System.out.println("\nVOCÊ GANHOU!");
         }
     }
 
+    public BattleStatus getBattleStatus() {
+        return battleStatus;
+    }
 }

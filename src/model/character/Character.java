@@ -1,12 +1,12 @@
 package model.character;
 
 public abstract class Character {
-    private String Name;
-    private int Health;
-    private int MaxHealth;
-    private int Damage;
-    private int Speed;
-    private int Defense;
+    protected String Name;
+    protected int Health;
+    protected int MaxHealth;
+    protected int Damage;
+    protected int Speed;
+    protected int Defense;
 
     public Character(String Name, int Health, int MaxHealth, int Damage, int Speed, int Defense){
         this.Name = Name;
@@ -26,9 +26,7 @@ public abstract class Character {
         this.Health = Math.min(this.Health + Amount, MaxHealth);
     }
 
-    public boolean isAlive() {
-        return Health > 0;
-    }
+    public abstract void HealCharacter();
 
     public void DisplayCharacterInfo(){
         System.out.println(Name);
@@ -37,8 +35,6 @@ public abstract class Character {
         System.out.println("Speed: " + Speed);
         System.out.println("Defense: " + Defense);
     }
-
-    public abstract void CharacterQuirk();
 
     public String getName() { return Name; }
 
@@ -54,5 +50,9 @@ public abstract class Character {
 
     public int getDamage() {
         return Damage;
+    }
+
+    public boolean IsAlive(){
+        return Health > 0;
     }
 }
