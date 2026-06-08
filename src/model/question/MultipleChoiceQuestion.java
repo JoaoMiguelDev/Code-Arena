@@ -16,12 +16,9 @@ public class MultipleChoiceQuestion extends Question {
         java.util.Random random = new java.util.Random();
 
         while (true) {
-            // Sorteia um índice qualquer entre 0 e o total de opções (ex: 0 a 3)
             int randomIndex = random.nextInt(Options.size());
 
-            // Se o índice sorteado for DIFERENTE do índice correto, encontrámos uma errada!
             if (randomIndex != CorrectIndex) {
-                // Converte o índice numérico para a letra correspondente (0 -> 'A', 1 -> 'B', etc.)
                 return (char) ('A' + randomIndex);
             }
         }
@@ -45,16 +42,13 @@ public class MultipleChoiceQuestion extends Question {
             return false;
         }
 
-        // Remove espaços e converte para maiúsculo
         answer = answer.trim().toUpperCase();
 
-        // Caso 1: Usuário respondeu com letra (A, B, C, D)
         if (answer.length() == 1 && answer.charAt(0) >= 'A' && answer.charAt(0) <= 'Z') {
             int selectedIndex = answer.charAt(0) - 'A';
             return selectedIndex == CorrectIndex;
         }
 
-        // Caso 2: Usuário respondeu com o texto completo
         return answer.equalsIgnoreCase(CorrectAnswer);
     }
 

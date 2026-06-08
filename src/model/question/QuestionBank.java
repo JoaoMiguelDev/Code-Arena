@@ -249,8 +249,6 @@ public class QuestionBank {
     }
 
     public List<Question> FilterByDifficulty(Difficulty difficulty){
-//        List<Question> FilteredQuestions = questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList());
-//        return FilteredQuestions;
         return questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList()); //this way has support to older Java Versions
     }
 }

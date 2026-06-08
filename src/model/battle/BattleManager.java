@@ -42,8 +42,6 @@ public class BattleManager {
         DisplayIntro();
 
         while (battleStatus == BattleStatus.ONGOING) {
-
-            // Se for a Cartomante, ela escolhe a dificuldade da rodada atual de forma dinâmica
             if (Player instanceof FortuneTeller) {
                 System.out.println("\n[Cartomante] Escolha a dificuldade da próxima pergunta:");
                 System.out.println("1 - EASY | 2 - MEDIUM | 3 - HARD");

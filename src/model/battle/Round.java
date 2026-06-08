@@ -59,7 +59,6 @@ public class Round {
         if(playerMoveFirst){
             PlayerTurn(scanner);
 
-            // Critério de parada: Se o inimigo morreu com o golpe do Player, o turno acaba!
             if (!Enemy.IsAlive()) {
                 return;
             }

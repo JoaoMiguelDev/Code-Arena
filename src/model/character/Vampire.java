@@ -12,7 +12,7 @@ public class Vampire extends Character implements SpecialAbility {
 
     @Override
     public void HealCharacter() {
-        this.Heal(30); // Cura extra pós-batalha
+        this.Heal(30);
     }
 
     @Override
