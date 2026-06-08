@@ -107,7 +107,7 @@ public class Game {
         System.out.println();
         System.out.println("3 - BOBO - Dano alto");
         System.out.println("   Vida: 80 | Ataque: 40 | Velocidade: 10");
-        System.out.println("   Habilidade: Errar é o mesmo que acetar uma questão fácil, porém recebe o dobro do dano");
+        System.out.println("   Habilidade: Errar é o mesmo que acertar uma questão fácil, porém recebe o dobro do dano");
         System.out.println("=".repeat(50));
 
         while (true) {
@@ -115,16 +115,27 @@ public class Game {
             String choice = Scanner.nextLine().trim();
 
             switch (choice) {
-                //This part is still in development, for now the only possible character is Dummy
-                default:
-                    System.out.println("Você escolheu DUMMY!");
-                    return new Dummy();
+                case "1":
+                    System.out.println("Você escolheu VAMPIRO!");
+                    return new Vampire();
+                case "2":
+                    System.out.println("Você escolheu CARTOMANTE!");
+                    return new FortuneTeller();
+                case "3":
+                    System.out.println("Você escolheu BOBO!");
+                    return new Fool();
             }
         }
     }
 
     private void SetEnemyWave(){
-        Enemies.add(new Dummy());
+        this.Enemies.clear();
+
+        Enemies.add(new Enemy("Bloatware", 60, 60, 8, 1, 0));
+
+        Enemies.add(new Enemy("Worm", 100, 100, 12, 4, 2));
+
+        Enemies.add(new Enemy("Rat", 150, 150, 15, 6, 4));
     }
 
     private void StartBattle(){

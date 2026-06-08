@@ -12,6 +12,18 @@ public class MultipleChoiceQuestion extends Question {
         this.CorrectIndex = correctIndex;
     }
 
+    public char getIncorrectOption() {
+        java.util.Random random = new java.util.Random();
+
+        while (true) {
+            int randomIndex = random.nextInt(Options.size());
+
+            if (randomIndex != CorrectIndex) {
+                return (char) ('A' + randomIndex);
+            }
+        }
+    }
+
     @Override
     public void DisplayQuestion() {
         System.out.println("\n" + Text);
@@ -30,16 +42,13 @@ public class MultipleChoiceQuestion extends Question {
             return false;
         }
 
-        // Remove espaços e converte para maiúsculo
         answer = answer.trim().toUpperCase();
 
-        // Caso 1: Usuário respondeu com letra (A, B, C, D)
         if (answer.length() == 1 && answer.charAt(0) >= 'A' && answer.charAt(0) <= 'Z') {
             int selectedIndex = answer.charAt(0) - 'A';
             return selectedIndex == CorrectIndex;
         }
 
-        // Caso 2: Usuário respondeu com o texto completo
         return answer.equalsIgnoreCase(CorrectAnswer);
     }
 

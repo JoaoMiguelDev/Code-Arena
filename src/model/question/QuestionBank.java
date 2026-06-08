@@ -134,6 +134,15 @@ public class QuestionBank {
                         "Procedural"),
                 2, Difficulty.MEDIUM));
 
+        questions.add(new TimedMultipleChoiceQuestion(
+                "[CRONOMETRADA] Qual comando Git é utilizado para mesclar ramificações mantendo o histórico linear?",
+                Arrays.asList(
+                        "git merge",
+                        "git rebase",
+                        "git clone",
+                        "git push"),
+                1, Difficulty.MEDIUM, 15));
+
         questions.add(new TrueFalseQuestion(
                 "Na notação Big-O, O(n²) é mais eficiente que O(n log n) para grandes entradas.",
                 false, Difficulty.MEDIUM));
@@ -153,6 +162,12 @@ public class QuestionBank {
         questions.add(new TrueFalseQuestion(
                 "O conceito de polimorfismo em orientação a objetos permite que um mesmo método se comporte de formas diferentes dependendo do objeto que o invoca.",
                 true, Difficulty.MEDIUM));
+
+        questions.add(new FillBlankQuestion(
+                "Em Java, a palavra-chave utilizada para herdar uma classe é _______.",
+                "extends",
+                Difficulty.MEDIUM
+        ));
 
         // ========================
         // HARD
@@ -203,6 +218,15 @@ public class QuestionBank {
                         "O(n²)"),
                 1, Difficulty.HARD));
 
+        questions.add(new TimedMultipleChoiceQuestion(
+                "[CRONOMETRADA] No escalonamento de processos, qual algoritmo pode sofrer do problema de Starvation crônico?",
+                Arrays.asList(
+                        "Round-Robin",
+                        "SJF (Shortest Job First) não-preemptivo",
+                        "Prioridade Estática",
+                        "FCFS"),
+                2, Difficulty.HARD, 10));
+
         questions.add(new TrueFalseQuestion(
                 "Em compiladores, a análise semântica é responsável por verificar se a estrutura sintática do código-fonte está correta, como o balanceamento de chaves e parênteses.",
                 false, Difficulty.HARD));
@@ -225,8 +249,6 @@ public class QuestionBank {
     }
 
     public List<Question> FilterByDifficulty(Difficulty difficulty){
-//        List<Question> FilteredQuestions = questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList());
-//        return FilteredQuestions;
         return questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList()); //this way has support to older Java Versions
     }
 }

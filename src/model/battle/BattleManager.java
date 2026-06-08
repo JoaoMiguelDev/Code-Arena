@@ -1,6 +1,7 @@
 package model.battle;
 
 import model.character.Character;
+import model.character.FortuneTeller;
 import model.question.Difficulty;
 import model.question.Question;
 import model.question.QuestionBank;
@@ -40,11 +41,24 @@ public class BattleManager {
 
         DisplayIntro();
 
-        while(battleStatus == BattleStatus.ONGOING){
-            try{
-                Question tryGetQuestion = BattleQuestions.get(RoundIndex);
-            } catch (IndexOutOfBoundsException e){
+        while (battleStatus == BattleStatus.ONGOING) {
+            if (Player instanceof FortuneTeller) {
+                System.out.println("\n[Cartomante] Escolha a dificuldade da próxima pergunta:");
+                System.out.println("1 - EASY | 2 - MEDIUM | 3 - HARD");
+                System.out.print("Opção: ");
+                String choice = scanner.nextLine().trim();
+
+                Difficulty chosenDifficulty = switch (choice) {
+                    case "2" -> Difficulty.MEDIUM;
+                    case "3" -> Difficulty.HARD;
+                    default -> Difficulty.EASY;
+                };
+
+                this.PrepareQuestions(chosenDifficulty);
+            }
+            if (BattleQuestions == null || RoundIndex >= BattleQuestions.size()) {
                 RoundIndex = 0;
+                if(BattleQuestions == null) this.PrepareQuestions(Difficulty.EASY);
                 Collections.shuffle(BattleQuestions);
             }
 
@@ -53,27 +67,20 @@ public class BattleManager {
             round.ExecuteRound(scanner);
             DisplayRoundResult();
 
-            RoundIndex ++;
-            RoundNumber ++;
+            RoundIndex++;
+            RoundNumber++;
 
             CheckBattleEnd();
         }
 
-
     }
 
-    private void DisplayIntro(){
-        System.out.println("YOU: " + Player.getName());
-        System.out.println("Health: " + Player.getHealth());
-        System.out.println("Damage: " + Player.getDamage());
-        System.out.println("Speed: " + Player.getSpeed());
+    public void DisplayIntro(){
+        Player.DisplayCharacterInfo();
 
         System.out.println("─".repeat(50));
 
-        System.out.println("ENEMY: " + Enemy.getName());
-        System.out.println("Health: " + Enemy.getHealth());
-        System.out.println("Damage: " + Enemy.getDamage());
-        System.out.println("Speed: " + Enemy.getSpeed());
+        Enemy.DisplayCharacterInfo();
 
         System.out.println("─".repeat(50));
     }
@@ -81,24 +88,24 @@ public class BattleManager {
     private void DisplayRoundResult(){
         System.out.println("─".repeat(50));
 
-        System.out.println("YOU: " + Player.getName());
-        System.out.println("Health: " + Player.getHealth());
+        System.out.println("VOCÊ: " + Player.getName());
+        System.out.println("Vida: " + Player.getHealth());
 
         System.out.println("─".repeat(50));
 
-        System.out.println("ENEMY: " + Enemy.getName());
-        System.out.println("Health: " + Enemy.getHealth());
+        System.out.println("INIMIGO: " + Enemy.getName());
+        System.out.println("Vida: " + Enemy.getHealth());
 
         System.out.println("─".repeat(50));
     }
 
     private void CheckBattleEnd(){
-        if(Player.getHealth() <= 0){
+        if(!Player.IsAlive()){
             battleStatus = BattleStatus.ENEMY_WON;
-            System.out.println("\nYOU LOST!");
-        } else if (Enemy.getHealth() <= 0) {
+            System.out.println("\nVOCÊ PERDEU!");
+        } else if (!Enemy.IsAlive()) {
             battleStatus = BattleStatus.PLAYER_WON;
-            System.out.println("\nYOU WON!");
+            System.out.println("\nVOCÊ GANHOU!");
         }
     }
 

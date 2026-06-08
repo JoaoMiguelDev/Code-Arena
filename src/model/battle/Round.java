@@ -1,8 +1,10 @@
 package model.battle;
 
 
-import model.question.Question;
+import model.question.*;
 import model.character.Character;
+import model.character.*;
+
 import java.util.Scanner;
 
 public class Round {
@@ -33,17 +35,12 @@ public class Round {
 
     private void DisplayInfo(){
         System.out.println("\n" + "=".repeat(50));
-        System.out.println("ROUND " + RoundNumber);
-        System.out.println("Question difficulty: " + RoundQuestion.getDifficulty());
+        System.out.println("RODADA " + RoundNumber);
+        System.out.println("Dificuldade da questão: " + RoundQuestion.getDifficulty());
         System.out.println("=".repeat(50));
 
-        System.out.println("YOU: " + Player.getName());
-        System.out.println("Health: " + Player.getHealth());
-
-        System.out.println("=".repeat(50));
-
-        System.out.println("ENEMY: " + Enemy.getName());
-        System.out.println("Health: " + Enemy.getHealth());
+        System.out.println("VOCÊ: " + Player.getName() + "          Inimigo: " + Enemy.getName());
+        System.out.println("Vida: " + Player.getHealth() + "            Vida: " + Enemy.getHealth());
 
         System.out.println("=".repeat(50));
     }
@@ -57,30 +54,55 @@ public class Round {
             return false;
         }
     }
-    
+
     private void HandleTurn(boolean playerMoveFirst, Scanner scanner){
         if(playerMoveFirst){
-          PlayerTurn(scanner);
+            PlayerTurn(scanner);
 
-//        if (!Enemy.IsAlive()) {
-//            return true;
-//        }
+            if (!Enemy.IsAlive()) {
+                return;
+            }
 
-          BotTurn();
+            BotTurn();
         } else {
             BotTurn();
+
+            // Critério de parada: Se o bot matou o Player, o jogador não joga!
+            if (!Player.IsAlive()) {
+                return;
+            }
+
             PlayerTurn(scanner);
         }
     }
 
     private void PlayerTurn(Scanner scanner){
         System.out.println("\n" + "─".repeat(50));
-        System.out.println("YOUR TURN");
+        System.out.println("SEU TURNO");
         System.out.println("=".repeat(50));
 
-        System.out.println("Choose an answer:");
+        if (Player instanceof SpecialAbility) {
+            ((SpecialAbility) Player).onBeforeAnswer(this, scanner);
+        }
 
+        long startTime = System.currentTimeMillis();
+        System.out.println("Escolha uma resposta:");
         PlayerAnswer = scanner.nextLine().trim();
+        long endTime = System.currentTimeMillis();
+        long elapsedSeconds = (endTime - startTime) / 1000;
+
+        if (RoundQuestion instanceof TimedQuestion timed) {
+            System.out.println("Tempo de resposta: " + elapsedSeconds + "s / Limite: " + timed.getTimeLimitInSeconds() + "s");
+
+            if (timed.IsTimeUp(elapsedSeconds)) {
+                System.out.println("\nVocê demorou demais e errou a rodada.");
+                PlayerWasCorrect = false;
+                PlayerAnswered = true;
+                Player.TakeDamage(10);
+                return;
+            }
+        }
+
         PlayerWasCorrect = RoundQuestion.CheckAnswer(PlayerAnswer);
         PlayerAnswered = true;
 
@@ -88,33 +110,37 @@ public class Round {
             int damage = CalculateBaseDamage(Player);
             Enemy.TakeDamage(damage);
             System.out.println("\n" + "─".repeat(50));
-
             System.out.println("RESULTADO: ACERTOU!");
             System.out.println("Resposta: " + RoundQuestion.getCorrectAnswer());
-            System.out.printf("Dano causado ao inimigo: " + damage);
-
+            System.out.println("Dano causado ao inimigo: " + damage);
             System.out.println("\n" + "─".repeat(50));
         } else {
             System.out.println("\n" + "─".repeat(50));
-
             System.out.println("RESULTADO: ERROU!");
             System.out.println("Resposta correta: " + RoundQuestion.getCorrectAnswer());
             System.out.println("Sua resposta: " + PlayerAnswer);
-
             System.out.println("─".repeat(50));
         }
 
+        if (Player instanceof SpecialAbility) {
+            ((SpecialAbility) Player).onAfterAnswer(this, PlayerWasCorrect);
+        }
     }
 
     private void BotTurn(){
         System.out.println("\n" + "─".repeat(50));
-        System.out.println("BOT TURN");
+        System.out.println("TURNO INIMIGO");
         System.out.println("=".repeat(50));
 
-        System.out.println("The bot is choosing an answer...");
+        System.out.println("O inimigo está escolhendo uma resposta...");
 
         if(botAnswerer.getBotAnswer(RoundQuestion, Enemy)){
             int damage = CalculateBaseDamage(Enemy);
+
+            if (Player instanceof Fool) {
+                damage *= 2;
+                System.out.println("[Bobo] O Bobo recebeu o dobro de dano!");
+            }
 
             Player.TakeDamage(damage);
 
@@ -135,6 +161,14 @@ public class Round {
 
     private int CalculateBaseDamage(Character character){
         return character.getDamage() * RoundQuestion.getDifficulty().getBaseDamage();
+    }
+
+    public Character getEnemy() {
+        return this.Enemy;
+    }
+
+    public Question getRoundQuestion() {
+        return this.RoundQuestion;
     }
 
 }
