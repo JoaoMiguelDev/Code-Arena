@@ -163,6 +163,12 @@ public class QuestionBank {
                 "O conceito de polimorfismo em orientação a objetos permite que um mesmo método se comporte de formas diferentes dependendo do objeto que o invoca.",
                 true, Difficulty.MEDIUM));
 
+        questions.add(new FillBlankQuestion(
+                "Em Java, a palavra-chave utilizada para herdar uma classe é _______.",
+                "extends",
+                Difficulty.MEDIUM
+        ));
+
         // ========================
         // HARD
         // ========================

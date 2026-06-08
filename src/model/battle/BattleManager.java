@@ -57,12 +57,11 @@ public class BattleManager {
                 };
 
                 this.PrepareQuestions(chosenDifficulty);
+            }
+            if (BattleQuestions == null || RoundIndex >= BattleQuestions.size()) {
                 RoundIndex = 0;
-            } else {
-                if (RoundIndex >= BattleQuestions.size()) {
-                    RoundIndex = 0;
-                    Collections.shuffle(BattleQuestions);
-                }
+                if(BattleQuestions == null) this.PrepareQuestions(Difficulty.EASY);
+                Collections.shuffle(BattleQuestions);
             }
 
             Question CurrentQuestion = BattleQuestions.get(RoundIndex);

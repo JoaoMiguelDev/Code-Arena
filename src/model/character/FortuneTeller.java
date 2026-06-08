@@ -2,6 +2,8 @@ package model.character;
 
 import model.battle.Round;
 
+import java.util.Scanner;
+
 public class FortuneTeller extends Character implements SpecialAbility {
     private boolean abilityUsedThisRound;
 
@@ -13,28 +15,33 @@ public class FortuneTeller extends Character implements SpecialAbility {
 
     @Override
     public void HealCharacter() {
-        this.Heal(40); // Boa cura passiva pós-batalha por ser tanque
+        this.Heal(40);
     }
 
     @Override
-    public void activateAbility(Round roundContext) {
-        // Como a habilidade dela é usada ANTES de responder (para ajudar a acertar),
-        // o gatilho principal será chamado direto no fluxo do Round.
-        System.out.println("\n[Cartomante] Visão do Futuro ativada para esta rodada!");
-        this.abilityUsedThisRound = true;
+    public void onBeforeAnswer(Round roundContext, Scanner scanner) {
+        if (roundContext.getRoundQuestion() instanceof model.question.MultipleChoiceQuestion mcq) {
+            this.abilityUsedThisRound = false;
+
+            System.out.println("[Cartomante] Deseja usar sua habilidade 'Visão do Futuro' para eliminar uma alternativa?");
+            System.out.print("(S/N): ");
+            String useAbility = scanner.nextLine().trim().toUpperCase();
+
+            if (useAbility.equals("S")) {
+                char incorrectLetter = mcq.getIncorrectOption();
+                this.abilityUsedThisRound = true;
+
+                System.out.println("\n[Cartomante] Visão do Futuro ativada para esta rodada!");
+                System.out.println("👉 Dica: A alternativa [" + incorrectLetter + "] está incorreta!");
+            }
+        }
     }
+
+    @Override
+    public void onAfterAnswer(Round roundContext, boolean isCorrect) {}
 
     @Override
     public String getAbilityDescription() {
         return "Por rodada, pode escolher a dificuldade das questões e eliminar uma alternativa errada.";
-    }
-
-    // Getters e Setters auxiliares para controlar o estado da habilidade na rodada
-    public boolean hasUsedAbilityThisRound() {
-        return abilityUsedThisRound;
-    }
-
-    public void setAbilityUsedThisRound(boolean used) {
-        this.abilityUsedThisRound = used;
     }
 }

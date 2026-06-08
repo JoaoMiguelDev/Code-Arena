@@ -2,6 +2,8 @@ package model.character;
 
 import model.battle.Round;
 
+import java.util.Scanner;
+
 public class Vampire extends Character implements SpecialAbility {
     public Vampire() {
         // Name, Health, MaxHealth, Damage, Speed, Defense
@@ -14,9 +16,14 @@ public class Vampire extends Character implements SpecialAbility {
     }
 
     @Override
-    public void activateAbility(Round roundContext) {
-        this.Heal(15);
-        System.out.println("[Vampiro] Drenagem de Sangue! Recuperou 15 de vida.");
+    public void onBeforeAnswer(Round roundContext, Scanner scanner) {}
+
+    @Override
+    public void onAfterAnswer(Round roundContext, boolean isCorrect) {
+        if (isCorrect) {
+            this.Heal(15);
+            System.out.println("[Vampiro] Drenagem de Sangue! Recuperou 15 de vida.");
+        }
     }
 
     @Override

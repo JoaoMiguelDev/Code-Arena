@@ -82,40 +82,23 @@ public class Round {
         System.out.println("SEU TURNO");
         System.out.println("=".repeat(50));
 
-        if (Player instanceof FortuneTeller && !(RoundQuestion instanceof TrueFalseQuestion)) {
-            FortuneTeller fortuneTeller = (FortuneTeller) Player;
-            fortuneTeller.setAbilityUsedThisRound(false); // Reseta o estado no início do turno
-
-            System.out.println("[Cartomante] Deseja usar sua habilidade 'Visão do Futuro' para eliminar uma alternativa?");
-            System.out.print("(S/N): ");
-            String useAbility = scanner.nextLine().trim().toUpperCase();
-
-            if (useAbility.equals("S")) {
-                MultipleChoiceQuestion mcq = (MultipleChoiceQuestion) RoundQuestion;
-                char incorrectLetter = mcq.getIncorrectOption();
-                fortuneTeller.activateAbility(this);
-
-                System.out.println("👉 Dica: A alternativa" + incorrectLetter + "está incorreta!");
-            }
+        if (Player instanceof SpecialAbility) {
+            ((SpecialAbility) Player).onBeforeAnswer(this, scanner);
         }
 
         long startTime = System.currentTimeMillis();
-
         System.out.println("Escolha uma resposta:");
         PlayerAnswer = scanner.nextLine().trim();
-
         long endTime = System.currentTimeMillis();
         long elapsedSeconds = (endTime - startTime) / 1000;
 
-        if (RoundQuestion instanceof TimedQuestion) {
-            TimedQuestion timed = (TimedQuestion) RoundQuestion;
+        if (RoundQuestion instanceof TimedQuestion timed) {
             System.out.println("Tempo de resposta: " + elapsedSeconds + "s / Limite: " + timed.getTimeLimitInSeconds() + "s");
 
             if (timed.IsTimeUp(elapsedSeconds)) {
                 System.out.println("\nVocê demorou demais e errou a rodada.");
                 PlayerWasCorrect = false;
                 PlayerAnswered = true;
-
                 Player.TakeDamage(10);
                 return;
             }
@@ -128,30 +111,20 @@ public class Round {
             int damage = CalculateBaseDamage(Player);
             Enemy.TakeDamage(damage);
             System.out.println("\n" + "─".repeat(50));
-
             System.out.println("RESULTADO: ACERTOU!");
             System.out.println("Resposta: " + RoundQuestion.getCorrectAnswer());
             System.out.println("Dano causado ao inimigo: " + damage);
             System.out.println("\n" + "─".repeat(50));
-
-            if (Player instanceof SpecialAbility&& !(Player instanceof FortuneTeller)) {
-                ((SpecialAbility) Player).activateAbility(this);
-            }
-
         } else {
             System.out.println("\n" + "─".repeat(50));
             System.out.println("RESULTADO: ERROU!");
             System.out.println("Resposta correta: " + RoundQuestion.getCorrectAnswer());
             System.out.println("Sua resposta: " + PlayerAnswer);
             System.out.println("─".repeat(50));
+        }
 
-            //Se o jogador escolhido for o Bobo
-            if (Player instanceof Fool) {
-                System.out.println("[Bobo] Você errou, mas seu palpite confuso causou dano!");
-                int pityDamage = Player.getDamage() * Difficulty.EASY.getBaseDamage();
-                Enemy.TakeDamage(pityDamage);
-                System.out.println("Dano de consolação causado: " + pityDamage);
-            }
+        if (Player instanceof SpecialAbility) {
+            ((SpecialAbility) Player).onAfterAnswer(this, PlayerWasCorrect);
         }
     }
 
@@ -189,6 +162,14 @@ public class Round {
 
     private int CalculateBaseDamage(Character character){
         return character.getDamage() * RoundQuestion.getDifficulty().getBaseDamage();
+    }
+
+    public Character getEnemy() {
+        return this.Enemy;
+    }
+
+    public Question getRoundQuestion() {
+        return this.RoundQuestion;
     }
 
 }
