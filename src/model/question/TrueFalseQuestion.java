@@ -3,13 +3,11 @@ package model.question;
 import java.util.List;
 
 public class TrueFalseQuestion extends Question {
-    private boolean CorrectAnswer;
 
     public TrueFalseQuestion(String text, boolean correctAnswer, Difficulty difficulty){
+        // Passa a representação em String diretamente para a classe mãe
         super(text, correctAnswer ? "Verdadeiro" : "Falso", difficulty);
-        this.CorrectAnswer = correctAnswer;
     }
-
 
     @Override
     public void DisplayQuestion() {
@@ -26,21 +24,25 @@ public class TrueFalseQuestion extends Question {
         if (answer == null || answer.isEmpty()) {
             return false;
         }
+
         answer = answer.trim().toUpperCase();
+        boolean isCorrectTrue = this.CorrectAnswer.equals("Verdadeiro");
+
         if (answer.equals("A") || answer.equals("VERDADEIRO") ||
                 answer.equals("TRUE") || answer.equals("V")) {
-            return CorrectAnswer == true;
+            return isCorrectTrue;
         }
 
         if (answer.equals("B") || answer.equals("FALSO") ||
                 answer.equals("FALSE") || answer.equals("F")) {
-            return CorrectAnswer == false;
+            return !isCorrectTrue;
         }
+
         return false;
     }
 
     @Override
     public List<String> GetAvailableAnswers() {
-        return List.of();
+        return List.of("A", "B");
     }
 }

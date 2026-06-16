@@ -1,8 +1,12 @@
 package game;
 
+import javax.swing.SwingUtilities;
+
 public class Main {
     public static void main(String[] args) {
-        Game game = new Game();
-        game.Start();
+        SwingUtilities.invokeLater(() -> {
+            GameWindow window = new GameWindow();
+            window.setVisible(true);
+        });
     }
 }

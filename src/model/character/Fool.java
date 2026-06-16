@@ -21,7 +21,7 @@ public class Fool extends Character implements SpecialAbility {
     public void onAfterAnswer(Round roundContext, boolean isCorrect) {
         if (!isCorrect) {
             System.out.println("\n[Bobo] Você errou, mas seu palpite confuso causou dano!");
-            int pityDamage = this.getDamage() * 1;
+            int pityDamage = this.getDamage() / 2;
 
             roundContext.getEnemy().TakeDamage(pityDamage);
             System.out.println("Dano de consolação causado: " + pityDamage);

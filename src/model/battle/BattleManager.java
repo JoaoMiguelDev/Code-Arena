@@ -1,6 +1,7 @@
 package model.battle;
 
 import model.character.Character;
+import model.character.Enemy;
 import model.character.FortuneTeller;
 import model.question.Difficulty;
 import model.question.Question;
@@ -11,7 +12,7 @@ public class BattleManager {
     private int RoundIndex = 0;
     private int RoundNumber = 1;
     private Character Player;
-    private Character Enemy;
+    private Enemy Enemy;
     private List<Question> BattleQuestions;
     private QuestionBank questionBank;
     private int BattleNumber;
@@ -21,7 +22,7 @@ public class BattleManager {
         ONGOING, PLAYER_WON, ENEMY_WON
     }
 
-    public BattleManager(Character player, Character enemy, int battleNumber){
+    public BattleManager(Character player, Enemy enemy, int battleNumber){
         this.Player = player;
         this.Enemy = enemy;
         this.BattleNumber = battleNumber;

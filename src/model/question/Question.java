@@ -12,6 +12,10 @@ public abstract class Question {
         this.Difficulty = difficulty;
     }
 
+    public String getText() {
+        return this.Text;
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty;
     }

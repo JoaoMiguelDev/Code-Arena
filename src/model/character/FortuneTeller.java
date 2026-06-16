@@ -9,7 +9,7 @@ public class FortuneTeller extends Character implements SpecialAbility {
 
     public FortuneTeller() {
         // Name, Health, MaxHealth, Damage, Speed, Defense
-        super("Cartomante", 180, 180, 5, 2, 4);
+        super("Cartomante", 180, 180, 15, 2, 10);
         this.abilityUsedThisRound = false;
     }
 

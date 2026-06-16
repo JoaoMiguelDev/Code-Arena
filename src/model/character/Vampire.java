@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Vampire extends Character implements SpecialAbility {
     public Vampire() {
         // Name, Health, MaxHealth, Damage, Speed, Defense
-        super("Vampiro", 120, 120, 10, 5, 2);
+        super("Vampiro", 120, 120, 25, 5, 5);
     }
 
     @Override
