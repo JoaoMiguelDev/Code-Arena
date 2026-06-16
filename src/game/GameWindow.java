@@ -344,7 +344,10 @@ public class GameWindow extends JFrame {
         enemies = java.util.Arrays.asList(
                 new Enemy("Bloatware", 30, 30, 5, 1, 0, "pré-instalado!"),
                 new Enemy("Adware", 60, 60, 10, 10, 0, "Temos algo para você!"),
-                new Enemy("Worm", 100, 100, 15, 15, 2, "Espalhando cópias...")
+                new Enemy("Worm", 100, 100, 15, 15, 2, "Espalhando cópias..."),
+                new Enemy("Spyware", 150, 150, 8, 1, 5,"Observando..."),
+                new Enemy("Ransomware", 50, 50, 5, 1, 40, "Dados criptografados!"),
+                new Enemy("R.A.T.", 200, 200, 15, 15, 15,"Controle total.")
         );
     }
 
