@@ -12,6 +12,10 @@ public class MultipleChoiceQuestion extends Question {
         this.CorrectIndex = correctIndex;
     }
 
+    public List<String> getOptions() {
+        return this.Options;
+    }
+
     public char getIncorrectOption() {
         java.util.Random random = new java.util.Random();
 
@@ -54,6 +58,6 @@ public class MultipleChoiceQuestion extends Question {
 
     @Override
     public List<String> GetAvailableAnswers() {
-        return List.of();
+        return List.of("A", "B", "C", "D");
     }
 }

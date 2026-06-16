@@ -11,13 +11,13 @@ public class Round {
     private int RoundNumber;
     private Question RoundQuestion;
     private Character Player;
-    private Character Enemy;
+    private Enemy Enemy;
     private String PlayerAnswer;
     private boolean PlayerAnswered = false;
     private boolean PlayerWasCorrect;
     private BotAnswerer botAnswerer;
 
-    public Round(int roundNumber, Question roundQuestion, Character player, Character enemy){
+    public Round(int roundNumber, Question roundQuestion, Character player, Enemy enemy){
         this.RoundNumber = roundNumber;
         this.RoundQuestion = roundQuestion;
         this.Player = player;
@@ -39,10 +39,11 @@ public class Round {
         System.out.println("Dificuldade da questão: " + RoundQuestion.getDifficulty());
         System.out.println("=".repeat(50));
 
-        System.out.println("VOCÊ: " + Player.getName() + "          Inimigo: " + Enemy.getName());
-        System.out.println("Vida: " + Player.getHealth() + "            Vida: " + Enemy.getHealth());
-
+        System.out.println(Enemy.getName());
+        System.out.println("Vida: " + Enemy.getHealth());
+        System.out.println(Enemy.getEnemyDescription());
         System.out.println("=".repeat(50));
+        System.out.println("Sua vida: " + Player.getHealth());
     }
     
     private boolean SpeedCheck(){
@@ -76,7 +77,7 @@ public class Round {
         }
     }
 
-    private void PlayerTurn(Scanner scanner){
+    private void PlayerTurn(Scanner scanner) {
         System.out.println("\n" + "─".repeat(50));
         System.out.println("SEU TURNO");
         System.out.println("=".repeat(50));
@@ -85,28 +86,44 @@ public class Round {
             ((SpecialAbility) Player).onBeforeAnswer(this, scanner);
         }
 
-        long startTime = System.currentTimeMillis();
-        System.out.println("Escolha uma resposta:");
-        PlayerAnswer = scanner.nextLine().trim();
-        long endTime = System.currentTimeMillis();
-        long elapsedSeconds = (endTime - startTime) / 1000;
+        PlayerAnswer = "";
+        PlayerWasCorrect = false;
 
         if (RoundQuestion instanceof TimedQuestion timed) {
-            System.out.println("Tempo de resposta: " + elapsedSeconds + "s / Limite: " + timed.getTimeLimitInSeconds() + "s");
+            int limit = timed.getTimeLimitInSeconds();
+            System.out.println("Escolha uma resposta (Você tem " + limit + "s):");
 
-            if (timed.IsTimeUp(elapsedSeconds)) {
-                System.out.println("\nVocê demorou demais e errou a rodada.");
-                PlayerWasCorrect = false;
-                PlayerAnswered = true;
+            long startTime = System.currentTimeMillis();
+            boolean AnsweredInTime = false;
+
+            try {
+                while ((System.currentTimeMillis() - startTime) < (limit * 1000)) {
+                    if (System.in.available() > 0) {
+                        PlayerAnswer = scanner.nextLine().trim();
+                        AnsweredInTime = true;
+                        break;
+                    }
+
+                    Thread.sleep(100);
+                }
+            } catch (Exception e) {
+                PlayerAnswer = "";
+            }
+
+            if (!AnsweredInTime) {
+                System.out.println("\n⏱️ ❌ O TEMPO ACABOU! Você demorou demais e errou a rodada.");
                 Player.TakeDamage(10);
                 return;
             }
+
+        } else {
+            System.out.println("Escolha uma resposta:");
+            PlayerAnswer = scanner.nextLine().trim();
         }
 
         PlayerWasCorrect = RoundQuestion.CheckAnswer(PlayerAnswer);
-        PlayerAnswered = true;
 
-        if(PlayerWasCorrect){
+        if (PlayerWasCorrect) {
             int damage = CalculateBaseDamage(Player);
             Enemy.TakeDamage(damage);
             System.out.println("\n" + "─".repeat(50));
@@ -147,7 +164,7 @@ public class Round {
             System.out.println("\n" + "─".repeat(50));
 
             System.out.println("RESULTADO: ACERTOU!");
-            System.out.printf("Dano causado à você: " + damage);
+            System.out.println("Dano causado à você: " + damage);
 
             System.out.println("\n" + "─".repeat(50));
         } else {
