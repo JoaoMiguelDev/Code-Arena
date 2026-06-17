@@ -17,10 +17,12 @@ public abstract class Character {
         this.Defense = Defense;
     }
 
-    public void TakeDamage(int DamageReceived){
+    public int TakeDamage(int DamageReceived){
         int DamageTaken = Math.max(0, DamageReceived - Defense);
         this.Health = Math.max(0, this.Health - DamageTaken);
+        return DamageTaken; // Agora retorna o valor líquido exato calculado pelo modelo
     }
+
 
     public void Heal(int Amount) {
         this.Health = Math.min(this.Health + Amount, MaxHealth);

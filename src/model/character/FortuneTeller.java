@@ -2,15 +2,10 @@ package model.character;
 
 import model.battle.Round;
 
-import java.util.Scanner;
-
 public class FortuneTeller extends Character implements SpecialAbility {
-    private boolean abilityUsedThisRound;
 
     public FortuneTeller() {
-        // Name, Health, MaxHealth, Damage, Speed, Defense
         super("Cartomante", 180, 180, 15, 2, 10);
-        this.abilityUsedThisRound = false;
     }
 
     @Override
@@ -19,23 +14,7 @@ public class FortuneTeller extends Character implements SpecialAbility {
     }
 
     @Override
-    public void onBeforeAnswer(Round roundContext, Scanner scanner) {
-        if (roundContext.getRoundQuestion() instanceof model.question.MultipleChoiceQuestion mcq) {
-            this.abilityUsedThisRound = false;
-
-            System.out.println("[Cartomante] Deseja usar sua habilidade 'Visão do Futuro' para eliminar uma alternativa?");
-            System.out.print("(S/N): ");
-            String useAbility = scanner.nextLine().trim().toUpperCase();
-
-            if (useAbility.equals("S")) {
-                char incorrectLetter = mcq.getIncorrectOption();
-                this.abilityUsedThisRound = true;
-
-                System.out.println("\n[Cartomante] Visão do Futuro ativada para esta rodada!");
-                System.out.println("👉 Dica: A alternativa [" + incorrectLetter + "] está incorreta!");
-            }
-        }
-    }
+    public void onBeforeAnswer(Round roundContext) {}
 
     @Override
     public void onAfterAnswer(Round roundContext, boolean isCorrect) {}

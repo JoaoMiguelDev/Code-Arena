@@ -1,43 +1,52 @@
 package game;
 
+import model.battle.BattleManager;
+import model.battle.Round;
 import model.character.Character;
 import model.character.*;
-import model.question.Question;
-import model.question.QuestionBank;
-import model.question.Difficulty;
+import model.question.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class GameWindow extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
-    // Estado do Jogo
-    private Character player;
-    private Enemy currentEnemy;
-    private int currentBattleIndex = 0;
-    private List<Enemy> enemies;
-    private List<Question> currentQuestions;
-    private int questionIndex = 0;
 
-    // Componentes da Tela de Batalha
+    private Character player;
+    private List<Enemy> enemies;
+    private int currentBattleIndex = 0;
+    private BattleManager battleManager;
+    private Round currentRound;
+
+
+    private Timer questionTimer;
+    private int timeLeft = 0;
+
+
     private JTextArea txtLog;
-    private JLabel lblPlayerHealth, lblEnemyHealth, lblQuestionText;
+    private JLabel lblPlayerHealth, lblEnemyHealth, lblTimerDisplay;
+    private JTextArea txtQuestionArea;
     private JButton btnOptA, btnOptB, btnOptC, btnOptD;
+
+
+    private CardLayout inputCardLayout;
+    private JPanel inputPanel;
+    private JTextField txtFillBlank;
+    private JButton btnConfirm;
 
     public GameWindow() {
         setTitle("CodeArena RPG");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 500);
+        setSize(1220, 550);
         setLocationRelativeTo(null);
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Inicializa as telas
         mainPanel.add(createMenuPanel(), "MENU");
         mainPanel.add(createCharacterSelectPanel(), "CHAR_SELECT");
         mainPanel.add(createBattlePanel(), "BATTLE");
@@ -47,118 +56,172 @@ public class GameWindow extends JFrame {
         initEnemies();
     }
 
+
+
     private JPanel createMenuPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(43, 43, 43));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; gbc.gridy = GridBagConstraints.RELATIVE;
-        gbc.insets = new Insets(10, 10, 10, 10);
+        JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
 
-        JLabel title = new JLabel("CODEARENA");
-        title.setFont(new Font("Monospaced", Font.BOLD, 36));
-        title.setForeground(Color.GREEN);
-        panel.add(title, gbc);
+        JLabel title = new JLabel("CodeArena RPG", SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 28));
+        panel.add(title);
 
-        JButton btnNewGame = createStyledButton("Novo Jogo");
-        btnNewGame.addActionListener(e -> cardLayout.show(mainPanel, "CHAR_SELECT"));
-        panel.add(btnNewGame, gbc);
+        JButton btnStart = new JButton("Novo Jogo");
+        btnStart.addActionListener(e -> cardLayout.show(mainPanel, "CHAR_SELECT"));
+        panel.add(btnStart);
 
-        JButton btnHowToPlay = createStyledButton("Como Jogar");
-        btnHowToPlay.addActionListener(e -> cardLayout.show(mainPanel, "HOW_TO_PLAY"));
-        panel.add(btnHowToPlay, gbc);
+        JButton btnHelp = new JButton("Como Jogar");
+        btnHelp.addActionListener(e -> cardLayout.show(mainPanel, "HOW_TO_PLAY"));
+        panel.add(btnHelp);
 
-        JButton btnExit = createStyledButton("Sair");
+        JButton btnExit = new JButton("Sair");
         btnExit.addActionListener(e -> System.exit(0));
-        panel.add(btnExit, gbc);
+        panel.add(btnExit);
 
         return panel;
     }
 
     private JPanel createCharacterSelectPanel() {
-        JPanel panel = new JPanel(new GridLayout(1, 3, 10, 10));
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(43, 43, 43));
 
-        panel.add(createCharCard("Vampiro", "Vida: 120 | Atk: 25\nHabilidade:\nRecupera 15 de vida\nao acertar.", () -> player = new Vampire()));
-        panel.add(createCharCard("Cartomante", "Vida: 180 | Atk: 15\nHabilidade:\nRemove uma alternativa\nerrada.", () -> player = new FortuneTeller()));
-        panel.add(createCharCard("Bobo", "Vida: 80 | Atk: 40\nHabilidade:\nErrar causa dano,\nmas recebe o dobro.", () -> player = new Fool()));
+        JLabel title = new JLabel("Selecione seu Campeão", SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        panel.add(title, BorderLayout.NORTH);
+
+        JPanel charsPanel = new JPanel(new GridLayout(1, 3, 15, 15));
+        charsPanel.add(createCharCard("Vampiro", new Vampire()));
+        charsPanel.add(createCharCard("Cartomante", new FortuneTeller()));
+        charsPanel.add(createCharCard("Bobo", new Fool()));
+        panel.add(charsPanel, BorderLayout.CENTER);
+
+        JButton btnBack = new JButton("Voltar ao Menu");
+        btnBack.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
+        panel.add(btnBack, BorderLayout.SOUTH);
 
         return panel;
     }
 
-    private JPanel createCharCard(String name, String desc, Runnable selectAction) {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-        card.setBackground(new Color(60, 63, 65));
+    private JPanel createCharCard(String name, Character characterInstance) {
+        JPanel card = new JPanel(new BorderLayout(5, 5));
+        card.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel lblName = new JLabel(name, SwingConstants.CENTER);
-        lblName.setFont(new Font("SansSerif", Font.BOLD, 18));
-        lblName.setForeground(Color.WHITE);
+        String details = String.format(
+                "<html><center><b>%s</b><br><br>🩸 HP: %d<br>⚔ ATK: %d<br>🛡 DEF: %d<br>⚡ SPD: %d<br><br><i>%s</i></center></html>",
+                name, characterInstance.getMaxHealth(), characterInstance.getDamage(),
+                characterInstance.getSpeed(), characterInstance.getSpeed(),
+                (characterInstance instanceof SpecialAbility sa) ? sa.getAbilityDescription() : ""
+        );
 
-        JTextArea txtDesc = new JTextArea(desc);
-        txtDesc.setEditable(false);
-        txtDesc.setBackground(new Color(60, 63, 65));
-        txtDesc.setForeground(Color.LIGHT_GRAY);
-        txtDesc.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        JLabel lblInfo = new JLabel(details, SwingConstants.CENTER);
+        card.add(lblInfo, BorderLayout.CENTER);
 
-        JButton btnSelect = createStyledButton("Escolher");
+        JButton btnSelect = new JButton("Escolher " + name);
         btnSelect.addActionListener(e -> {
-            selectAction.run();
-            startNewGame();
+            this.player = characterInstance;
+            this.currentBattleIndex = 0;
+            startBattle();
         });
-
-        card.add(lblName, BorderLayout.NORTH);
-        card.add(txtDesc, BorderLayout.CENTER);
         card.add(btnSelect, BorderLayout.SOUTH);
+
         return card;
     }
 
-    private JPanel createHowToPlayPanel() {
+    private JPanel createBattlePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(new Color(43, 43, 43));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel topPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+        lblPlayerHealth = new JLabel("Jogador: --", SwingConstants.LEFT);
+        lblPlayerHealth.setFont(new Font("Monospaced", Font.BOLD, 12));
+
+        lblTimerDisplay = new JLabel("⏱ Tempo: --", SwingConstants.CENTER);
+        lblTimerDisplay.setFont(new Font("Arial", Font.BOLD, 14));
+        lblTimerDisplay.setForeground(Color.RED);
+
+        lblEnemyHealth = new JLabel("Inimigo: --", SwingConstants.RIGHT);
+        lblEnemyHealth.setFont(new Font("Monospaced", Font.BOLD, 12));
+
+        topPanel.add(lblPlayerHealth);
+        topPanel.add(lblTimerDisplay);
+        topPanel.add(lblEnemyHealth);
+        panel.add(topPanel, BorderLayout.NORTH);
+
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+
+        txtQuestionArea = new JTextArea("Carregando pergunta...");
+        txtQuestionArea.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtQuestionArea.setLineWrap(true);
+        txtQuestionArea.setWrapStyleWord(true);
+        txtQuestionArea.setEditable(false);
+        txtQuestionArea.setBackground(new Color(245, 245, 245));
+        txtQuestionArea.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        centerPanel.add(txtQuestionArea);
+
+        txtLog = new JTextArea();
+        txtLog.setEditable(false);
+        txtLog.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        centerPanel.add(new JScrollPane(txtLog));
+
+        panel.add(centerPanel, BorderLayout.CENTER);
+
+
+        JPanel btnPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        btnOptA = new JButton("A");
+        btnOptB = new JButton("B");
+        btnOptC = new JButton("C");
+        btnOptD = new JButton("D");
+
+        btnOptA.addActionListener(e -> handleAnswer("A"));
+        btnOptB.addActionListener(e -> handleAnswer("B"));
+        btnOptC.addActionListener(e -> handleAnswer("C"));
+        btnOptD.addActionListener(e -> handleAnswer("D"));
+
+        btnPanel.add(btnOptA);
+        btnPanel.add(btnOptB);
+        btnPanel.add(btnOptC);
+        btnPanel.add(btnOptD);
+
+
+        JPanel fillPanel = new JPanel(new BorderLayout(5, 0));
+        fillPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        txtFillBlank = new JTextField();
+        txtFillBlank.setFont(new Font("Arial", Font.PLAIN, 14));
+        btnConfirm = new JButton("Confirmar ✔");
+        btnConfirm.addActionListener(e -> handleAnswer(txtFillBlank.getText().trim()));
+
+        txtFillBlank.addActionListener(e -> handleAnswer(txtFillBlank.getText().trim()));
+        fillPanel.add(txtFillBlank, BorderLayout.CENTER);
+        fillPanel.add(btnConfirm, BorderLayout.EAST);
+
+
+        inputCardLayout = new CardLayout();
+        inputPanel = new JPanel(inputCardLayout);
+        inputPanel.add(btnPanel, "BUTTONS");
+        inputPanel.add(fillPanel, "FILL_BLANK");
+
+        panel.add(inputPanel, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    private JPanel createHowToPlayPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Título da Tela
-        JLabel title = new JLabel("COMO JOGAR", SwingConstants.CENTER);
-        title.setFont(new Font("Monospaced", Font.BOLD, 28));
-        title.setForeground(Color.GREEN);
-        panel.add(title, BorderLayout.NORTH);
+        JTextArea helpText = new JTextArea("Como Jogar Arena Code RPG:\n\n" +
+                "1. Selecione seu herói e analise os atributos carregados do core principal.\n" +
+                "2. Utilize os botões para responder às questões técnicas apresentadas.\n" +
+                "3. Respeite o tempo limite exibido em tela para não sofrer penalidades automáticas.\n" +
+                "4. Expurgue todas as ondas de vírus sequenciais para vencer.");
+        helpText.setEditable(false);
+        helpText.setLineWrap(true);
+        helpText.setWrapStyleWord(true);
+        panel.add(new JScrollPane(helpText), BorderLayout.CENTER);
 
-        // Conteúdo das Instruções
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        txtInstructions.setBackground(new Color(60, 63, 65));
-
-        String htmlContent = "<html><body style='font-family:SansSerif; color:white; font-size:12px; padding:10px;'>"
-                + "<h2 style='color: #4682B4; margin-top:0;'>🎯 OBJETIVO</h2>"
-                + "<p>Derrote todos os inimigos da arena respondendo perguntas de programação corretamente!</p>"
-
-                + "<h2 style='color: #4682B4;'>⚔️ MECÂNICAS</h2>"
-                + "<ul>"
-                + "  <li>Cada pergunta possui uma dificuldade (Fácil, Médio, Difícil).</li>"
-                + "  <li>Acertar a pergunta faz seu herói atacar o inimigo.</li>"
-                + "  <li>Quanto maior a dificuldade da pergunta, maior o dano causado!</li>"
-                + "  <li>Mas cuidado: errar a resposta permite que o inimigo te contra-ataque.</li>"
-                + "  <li>Cada herói possui <b>habilidades passivas exclusivas</b> que mudam a gameplay!</li>"
-                + "</ul>"
-
-                + "<h2 style='color: #4682B4;'>📝 TIPOS DE PERGUNTA</h2>"
-                + "<ul>"
-                + "  <li><b>Múltipla Escolha:</b> Escolha a alternativa correta entre as 4 opções (A, B, C ou D).</li>"
-                + "  <li><b>Verdadeiro ou Falso:</b> Avalie a afirmação clicando em A (Verdadeiro) ou B (Falso).</li>"
-                + "  <li><b>Preencher a Lacuna:</b> Uma caixa de texto surgirá na tela para você digitar o termo correto.</li>"
-                + "  <li><b>⏱️ Cronometradas:</b> Questões com contagem regressiva! Responda antes que o tempo esgote.</li>"
-                + "</ul>"
-                + "</body></html>";
-
-        txtInstructions.setText(htmlContent);
-        JScrollPane scrollPane = new JScrollPane(txtInstructions);
-        scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        panel.add(scrollPane, BorderLayout.CENTER);
-
-        // Botão Voltar
-        JButton btnBack = createStyledButton("Voltar ao Menu");
+        JButton btnBack = new JButton("Voltar");
         btnBack.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
         panel.add(btnBack, BorderLayout.SOUTH);
 
@@ -166,198 +229,211 @@ public class GameWindow extends JFrame {
     }
 
 
-    private JPanel createBattlePanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(new Color(43, 43, 43));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Placar de Vida
-        JPanel pnlStatus = new JPanel(new GridLayout(1, 2));
-        pnlStatus.setBackground(new Color(43, 43, 43));
-        lblPlayerHealth = new JLabel("Jogador: --", SwingConstants.LEFT);
-        lblPlayerHealth.setForeground(Color.CYAN);
-        lblEnemyHealth = new JLabel("Inimigo: --", SwingConstants.RIGHT);
-        lblEnemyHealth.setForeground(Color.ORANGE);
-        pnlStatus.add(lblPlayerHealth);
-        pnlStatus.add(lblEnemyHealth);
-        panel.add(pnlStatus, BorderLayout.NORTH);
+    private void startBattle() {
+        if (currentBattleIndex >= enemies.size()) return;
 
-        // Texto da Pergunta e Histórico Central
-        JPanel pnlCenter = new JPanel(new GridLayout(2, 1, 5, 5));
-        pnlCenter.setBackground(new Color(43, 43, 43));
+        Enemy enemy = enemies.get(currentBattleIndex);
+        battleManager = new BattleManager(player, enemy, currentBattleIndex + 1);
 
-        lblQuestionText = new JLabel("Pergunta aqui...", SwingConstants.CENTER);
-        lblQuestionText.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblQuestionText.setForeground(Color.WHITE);
 
-        txtLog = new JTextArea();
-        txtLog.setEditable(false);
-        txtLog.setBackground(Color.BLACK);
-        txtLog.setForeground(Color.GREEN);
-        JScrollPane scrollLog = new JScrollPane(txtLog);
+        Difficulty selectedDifficulty = calculateDefaultDifficulty();
+        if (battleManager.playerChoosesDifficulty()) {
+            selectedDifficulty = askFortuneTellerDifficulty();
+        }
 
-        pnlCenter.add(lblQuestionText);
-        pnlCenter.add(scrollLog);
-        panel.add(pnlCenter, BorderLayout.CENTER);
+        battleManager.PrepareQuestions(selectedDifficulty);
+        txtLog.setText("Combate iniciado contra: " + enemy.getName() + "!\n" + enemy.getEnemyDescription()+ "!\n");
 
-        // Botões de Alternativas
-        JPanel pnlOptions = new JPanel(new GridLayout(2, 2, 5, 5));
-        pnlOptions.setBackground(new Color(43, 43, 43));
-        btnOptA = createStyledButton("A"); btnOptA.addActionListener(e -> handleAnswer("A"));
-        btnOptB = createStyledButton("B"); btnOptB.addActionListener(e -> handleAnswer("B"));
-        btnOptC = createStyledButton("C"); btnOptC.addActionListener(e -> handleAnswer("C"));
-        btnOptD = createStyledButton("D"); btnOptD.addActionListener(e -> handleAnswer("D"));
-
-        pnlOptions.add(btnOptA); pnlOptions.add(btnOptB);
-        pnlOptions.add(btnOptC); pnlOptions.add(btnOptD);
-        panel.add(pnlOptions, BorderLayout.SOUTH);
-
-        return panel;
-    }
-
-    private void startNewGame() {
-        currentBattleIndex = 0;
-        txtLog.setText("Jogo Iniciado! Prepare-se para a batalha.\n");
+        updateStatus();
         cardLayout.show(mainPanel, "BATTLE");
-        nextBattle();
+        showNextQuestion();
     }
 
     private void nextBattle() {
         if (currentBattleIndex >= enemies.size()) {
-            JOptionPane.showMessageDialog(this, "🏆 PARABÉNS! Você zerou o CodeArena!");
+            JOptionPane.showMessageDialog(this, "PARABÉNS! Você venceu a CodeArena!");
             cardLayout.show(mainPanel, "MENU");
             return;
         }
 
-        currentEnemy = enemies.get(currentBattleIndex);
-        txtLog.append("\n⚔️ Batalha " + (currentBattleIndex + 1) + ": " + currentEnemy.getName() + " apareceu!\n");
+        Enemy enemy = enemies.get(currentBattleIndex);
+        battleManager = new BattleManager(player, enemy, currentBattleIndex + 1);
 
-        // Carrega perguntas baseadas no índice
-        QuestionBank bank = new QuestionBank();
-        Difficulty diff = (currentBattleIndex < 2) ? Difficulty.EASY : (currentBattleIndex < 4 ? Difficulty.MEDIUM : Difficulty.HARD);
-        currentQuestions = bank.FilterByDifficulty(diff);
-        Collections.shuffle(currentQuestions);
-        questionIndex = 0;
+        Difficulty selectedDifficulty = calculateDefaultDifficulty();
+        if (battleManager.playerChoosesDifficulty()) {
+            selectedDifficulty = askFortuneTellerDifficulty();
+        }
+
+        battleManager.PrepareQuestions(selectedDifficulty);
+        txtLog.append("\nNova ameaça: " + enemy.getName() + "\n" + enemy.getEnemyDescription() + "\n" );
+
+        updateStatus();
+        showNextQuestion();
+    }
+
+
+
+    private void handleAnswer(String selectedAnswer) {
+        stopTimer();
+        if (battleManager == null) return;
+
+
+        Round.RoundResult playerResult = currentRound.executePlayerTurn(selectedAnswer);
+        playerResult.logs.forEach(log -> txtLog.append(log + "\n"));
+
+
+        if (battleManager.getEnemy().IsAlive()) {
+            Round.RoundResult botResult = currentRound.executeBotTurn();
+            botResult.logs.forEach(log -> txtLog.append(log + "\n"));
+        }
+
+        battleManager.refreshBattleStatus();
+        updateStatus();
+        battleManager.advanceRound();
+        checkBattleState();
+    }
+
+    private void checkBattleState() {
+        BattleManager.BattleStatus status = battleManager.getBattleStatus();
+
+        if (status == BattleManager.BattleStatus.ENEMY_WON) {
+            JOptionPane.showMessageDialog(this,
+                    "GAME OVER! Seu herói foi corrompido por " + battleManager.getEnemy().getName() + ".");
+            txtLog.setText("");
+            currentBattleIndex = 0;
+            cardLayout.show(mainPanel, "MENU");
+            return;
+        }
+
+        if (status == BattleManager.BattleStatus.PLAYER_WON) {
+            txtLog.append("\n🏆 VITÓRIA! " + battleManager.getEnemy().getName() + " foi finalizado!\n");
+            battleManager.applyPostBattleHeal();
+            JOptionPane.showMessageDialog(this, "Fim do combate! Cura passiva do herói executada.");
+            currentBattleIndex++;
+            nextBattle();
+            return;
+        }
 
         showNextQuestion();
     }
 
-    private void showNextQuestion() {
-        updateStatus();
 
-        // Verifica se ainda há perguntas
-        if (questionIndex >= currentQuestions.size()) {
-            questionIndex = 0;
-            Collections.shuffle(currentQuestions);
+
+    private void showNextQuestion() {
+        if (battleManager == null) return;
+
+
+        currentRound = battleManager.buildCurrentRound();
+        currentRound.preparePlayerTurn();
+
+        Question question = currentRound.getRoundQuestion();
+        txtQuestionArea.setText(question.getText());
+
+
+        char eliminated = currentRound.getEliminatedOption();
+        if (eliminated != 0) {
+            txtLog.append("[Cartomante] Alternativa [" + eliminated + "] é incorreta!\n");
         }
 
-        Question q = currentQuestions.get(questionIndex);
+        configureButtons(question);
 
-        // Define o enunciado da pergunta
-        lblQuestionText.setText("<html><body style='width: 400px; text-align: center;'>" +
-                q.getText() + "</body></html>");
 
-        // Lógica para configurar os botões baseada no tipo de pergunta
-        if (q instanceof model.question.MultipleChoiceQuestion) {
-            model.question.MultipleChoiceQuestion mcq = (model.question.MultipleChoiceQuestion) q;
-            List<String> options = mcq.getOptions();
+        if (question instanceof TimedQuestion timedQ) {
+            timeLeft = timedQ.getTimeLimitInSeconds();
+            lblTimerDisplay.setText("⏱ Tempo: " + timeLeft + "s");
 
-            // Mostra todos os botões e define o texto de cada opção
-            btnOptA.setText("A) " + options.get(0));
-            btnOptB.setText("B) " + options.get(1));
-            btnOptC.setText("C) " + options.get(2));
-            btnOptD.setText("D) " + options.get(3));
+            questionTimer = new Timer(1000, e -> {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    lblTimerDisplay.setText("⏱ Tempo: ESGOTADO!");
+                    handleAnswer("");
+                } else {
+                    lblTimerDisplay.setText("⏱ Tempo: " + timeLeft + "s");
+                }
+            });
+            questionTimer.start();
+        } else {
+            lblTimerDisplay.setText("⏱ Sem Tempo Limite");
+        }
+    }
 
-            btnOptC.setVisible(true);
-            btnOptD.setVisible(true);
 
-        } else if (q instanceof model.question.TrueFalseQuestion) {
-            // Para Verdadeiro ou Falso
-            btnOptA.setText("A) Verdadeiro");
-            btnOptB.setText("B) Falso");
+    private void configureButtons(Question question) {
+        if (question instanceof FillBlankQuestion) {
+            txtFillBlank.setText("");
+            inputCardLayout.show(inputPanel, "FILL_BLANK");
 
-            // Esconde os botões C e D
-            btnOptC.setVisible(false);
-            btnOptD.setVisible(false);
+            SwingUtilities.invokeLater(() -> txtFillBlank.requestFocusInWindow());
+        } else {
+            inputCardLayout.show(inputPanel, "BUTTONS");
 
-        } else if (q instanceof model.question.FillBlankQuestion) {
-            String resposta = JOptionPane.showInputDialog(this, q.getText(), "Preencha a lacuna", JOptionPane.QUESTION_MESSAGE);
-            if (resposta != null) {
-                handleAnswer(resposta);
-            } else {
-                questionIndex++;
-                showNextQuestion();
+            if (question instanceof TrueFalseQuestion) {
+                btnOptA.setText("A) Verdadeiro");
+                btnOptB.setText("B) Falso");
+                btnOptC.setVisible(false);
+                btnOptD.setVisible(false);
+            } else if (question instanceof MultipleChoiceQuestion mcq) {
+                List<String> options = mcq.getOptions();
+                btnOptA.setText("A) " + (options.size() > 0 ? options.get(0) : ""));
+                btnOptB.setText("B) " + (options.size() > 1 ? options.get(1) : ""));
+                btnOptC.setText("C) " + (options.size() > 2 ? options.get(2) : ""));
+                btnOptD.setText("D) " + (options.size() > 3 ? options.get(3) : ""));
+                btnOptC.setVisible(true);
+                btnOptD.setVisible(true);
             }
         }
     }
 
-    private void handleAnswer(String ans) {
-        Question q = currentQuestions.get(questionIndex);
 
-        // Se o clique veio de um botão (A, B, C, D), extrai apenas a primeira letra
-        String respostaProcessada = ans;
-        if (ans.contains(")")) {
-            respostaProcessada = ans.substring(0, ans.indexOf(")")).trim();
-        }
 
-        // Valida a resposta usando a lógica que você já tinha criado
-        boolean correct = q.CheckAnswer(respostaProcessada);
-
-        if (correct) {
-            int dmg = player.getDamage() * q.getDifficulty().getBaseDamage();
-            currentEnemy.TakeDamage(dmg);
-            txtLog.append("💥 Você ACERTOU e causou " + dmg + " de dano!\n");
-        } else {
-            int dmgInimigo = currentEnemy.getDamage();
-            player.TakeDamage(dmgInimigo);
-            txtLog.append("❌ Você ERROU! O inimigo revidou e te deu " + dmgInimigo + " de dano.\n");
-        }
-
-        // Rola o log de texto automaticamente para baixo
-        txtLog.setCaretPosition(txtLog.getDocument().getLength());
-
-        questionIndex++;
-        checkBattleConditions();
-    }
-
-    private void checkBattleConditions() {
-        updateStatus();
-        if (!currentEnemy.IsAlive()) {
-            txtLog.append("\n🎉 Você derrotou " + currentEnemy.getName() + "!\n");
-            player.HealCharacter();
-            currentBattleIndex++;
-            nextBattle();
-        } else if (!player.IsAlive()) {
-            JOptionPane.showMessageDialog(this, "💀 GAME OVER! Seu herói foi derrotado.");
-            cardLayout.show(mainPanel, "MENU");
-        } else {
-            showNextQuestion();
+    private void stopTimer() {
+        if (questionTimer != null && questionTimer.isRunning()) {
+            questionTimer.stop();
         }
     }
 
     private void updateStatus() {
-        lblPlayerHealth.setText("Seu HP: " + player.getHealth() + "/" + player.getMaxHealth());
-        lblEnemyHealth.setText(currentEnemy.getName() + " HP: " + currentEnemy.getHealth() + "/" + currentEnemy.getMaxHealth());
+        if (player == null || battleManager == null) return;
+        Enemy enemy = battleManager.getEnemy();
+
+        lblPlayerHealth.setText(String.format("%s | HP: %d/%d | ATK: %d | DEF: %d",
+                player.getName(), player.getHealth(), player.getMaxHealth(),
+                player.getDamage(), player.getSpeed()));
+
+        lblEnemyHealth.setText(String.format("%s | HP: %d/%d | ATK: %d | DEF: %d",
+                enemy.getName(), enemy.getHealth(), enemy.getMaxHealth(),
+                enemy.getDamage(), enemy.getSpeed()));
+    }
+
+    private Difficulty calculateDefaultDifficulty() {
+        return switch (currentBattleIndex) {
+            case 0 -> Difficulty.EASY;
+            case 1 -> Difficulty.MEDIUM;
+            default -> Difficulty.HARD;
+        };
+    }
+
+
+    private Difficulty askFortuneTellerDifficulty() {
+        String[] options = {"EASY", "MEDIUM", "HARD"};
+        String choice = (String) JOptionPane.showInputDialog(this,
+                "[Cartomante] Filtre a dificuldade da rodada:",
+                "Habilidade: Escolha de Dificuldade",
+                JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (choice != null) return Difficulty.valueOf(choice);
+        return calculateDefaultDifficulty();
     }
 
     private void initEnemies() {
-        enemies = java.util.Arrays.asList(
-                new Enemy("Bloatware", 30, 30, 5, 1, 0, "pré-instalado!"),
-                new Enemy("Adware", 60, 60, 10, 10, 0, "Temos algo para você!"),
-                new Enemy("Worm", 100, 100, 15, 15, 2, "Espalhando cópias..."),
-                new Enemy("Spyware", 150, 150, 8, 1, 5,"Observando..."),
-                new Enemy("Ransomware", 50, 50, 5, 1, 40, "Dados criptografados!"),
-                new Enemy("R.A.T.", 200, 200, 15, 15, 15,"Controle total.")
+        enemies = Arrays.asList(
+                new Enemy("Bloatware",  30,  30,  5,  1,  0, "Pré-instalado!"),
+                new Enemy("Adware",     60,  60, 10, 10,  0, "Temos ofertas para você!"),
+                new Enemy("Worm",      100, 100, 15, 15,  2, "Espalhando cópias..."),
+                new Enemy("Spyware",   150, 150,  8,  1,  5, "Observando..."),
+                new Enemy("Ransomware", 50,  50,  5,  1, 40, "Dados criptografados!"),
+                new Enemy("R.A.T.",    200, 200, 15, 15, 15, "Controle absoluto.")
         );
-    }
-
-    // Estilo padrão de botões UI
-    private JButton createStyledButton(String text) {
-        JButton btn = new JButton(text);
-        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
-        btn.setBackground(new Color(70, 130, 180));
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        return btn;
     }
 }

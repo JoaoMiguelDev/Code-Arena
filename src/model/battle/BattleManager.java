@@ -18,11 +18,11 @@ public class BattleManager {
     private int BattleNumber;
     private BattleStatus battleStatus;
 
-    public enum BattleStatus{
+    public enum BattleStatus {
         ONGOING, PLAYER_WON, ENEMY_WON
     }
 
-    public BattleManager(Character player, Enemy enemy, int battleNumber){
+    public BattleManager(Character player, Enemy enemy, int battleNumber) {
         this.Player = player;
         this.Enemy = enemy;
         this.BattleNumber = battleNumber;
@@ -30,87 +30,55 @@ public class BattleManager {
         this.battleStatus = BattleStatus.ONGOING;
     }
 
-    public void PrepareQuestions(Difficulty difficulty){
+    public void PrepareQuestions(Difficulty difficulty) {
         BattleQuestions = questionBank.FilterByDifficulty(difficulty);
         Collections.shuffle(BattleQuestions);
+        RoundIndex = 0;
     }
 
-    public void ExecuteBattle(Scanner scanner){
-        System.out.println("\n" + "─".repeat(50));
-        System.out.println("A BATALHA " + BattleNumber + " COMEÇOU!");
-        System.out.println("─".repeat(50));
 
-        DisplayIntro();
 
-        while (battleStatus == BattleStatus.ONGOING) {
-            if (Player instanceof FortuneTeller) {
-                System.out.println("\n[Cartomante] Escolha a dificuldade da próxima pergunta:");
-                System.out.println("1 - EASY | 2 - MEDIUM | 3 - HARD");
-                System.out.print("Opção: ");
-                String choice = scanner.nextLine().trim();
 
-                Difficulty chosenDifficulty = switch (choice) {
-                    case "2" -> Difficulty.MEDIUM;
-                    case "3" -> Difficulty.HARD;
-                    default -> Difficulty.EASY;
-                };
-
-                this.PrepareQuestions(chosenDifficulty);
-            }
-            if (BattleQuestions == null || RoundIndex >= BattleQuestions.size()) {
-                RoundIndex = 0;
-                if(BattleQuestions == null) this.PrepareQuestions(Difficulty.EASY);
-                Collections.shuffle(BattleQuestions);
-            }
-
-            Question CurrentQuestion = BattleQuestions.get(RoundIndex);
-            Round round = new Round(RoundNumber, CurrentQuestion, Player, Enemy);
-            round.ExecuteRound(scanner);
-            DisplayRoundResult();
-
-            RoundIndex++;
-            RoundNumber++;
-
-            CheckBattleEnd();
+    public Question getCurrentQuestion() {
+        if (BattleQuestions == null || BattleQuestions.isEmpty()) {
+            PrepareQuestions(Difficulty.EASY);
         }
-
+        if (RoundIndex >= BattleQuestions.size()) {
+            Collections.shuffle(BattleQuestions);
+            RoundIndex = 0;
+        }
+        return BattleQuestions.get(RoundIndex);
     }
 
-    public void DisplayIntro(){
-        Player.DisplayCharacterInfo();
 
-        System.out.println("─".repeat(50));
-
-        Enemy.DisplayCharacterInfo();
-
-        System.out.println("─".repeat(50));
+    public Round buildCurrentRound() {
+        return new Round(RoundNumber, getCurrentQuestion(), Player, Enemy);
     }
 
-    private void DisplayRoundResult(){
-        System.out.println("─".repeat(50));
 
-        System.out.println("VOCÊ: " + Player.getName());
-        System.out.println("Vida: " + Player.getHealth());
-
-        System.out.println("─".repeat(50));
-
-        System.out.println("INIMIGO: " + Enemy.getName());
-        System.out.println("Vida: " + Enemy.getHealth());
-
-        System.out.println("─".repeat(50));
+    public void advanceRound() {
+        RoundIndex++;
+        RoundNumber++;
     }
 
-    private void CheckBattleEnd(){
-        if(!Player.IsAlive()){
+
+    public void refreshBattleStatus() {
+        if (!Player.IsAlive()) {
             battleStatus = BattleStatus.ENEMY_WON;
-            System.out.println("\nVOCÊ PERDEU!");
         } else if (!Enemy.IsAlive()) {
             battleStatus = BattleStatus.PLAYER_WON;
-            System.out.println("\nVOCÊ GANHOU!");
         }
     }
 
-    public BattleStatus getBattleStatus() {
-        return battleStatus;
+    public boolean playerChoosesDifficulty() {
+        return Player instanceof FortuneTeller;
     }
+
+    public void applyPostBattleHeal() {
+        Player.HealCharacter();
+    }
+
+    public BattleStatus getBattleStatus() { return battleStatus; }
+    public Character getPlayer() { return Player; }
+    public Enemy getEnemy() { return Enemy; }
 }
