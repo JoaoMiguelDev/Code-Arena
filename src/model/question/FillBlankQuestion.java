@@ -9,20 +9,13 @@ public class FillBlankQuestion extends Question{
     }
 
     @Override
-    public void DisplayQuestion() {
-        System.out.println("\n" + Text);
-        System.out.println("─────────────────────────────────");
-        System.out.print("Digite a palavra que completa a lacuna: ");
-    }
-
-    @Override
-    public boolean CheckAnswer(String answer) {
+    public boolean checkAnswer(String answer) {
         if (answer == null) return false;
-        return answer.trim().equalsIgnoreCase(CorrectAnswer.trim());
+        return answer.trim().equalsIgnoreCase(correctAnswer.trim());
     }
 
     @Override
-    public List<String> GetAvailableAnswers() {
-        return List.of(CorrectAnswer);
+    public List<String> getAvailableAnswers() {
+        return List.of(correctAnswer);
     }
 }

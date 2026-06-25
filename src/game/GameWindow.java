@@ -2,6 +2,7 @@ package game;
 
 import model.battle.BattleManager;
 import model.battle.Round;
+import model.battle.ScoreSystem;
 import model.character.Character;
 import model.character.*;
 import model.question.*;
@@ -10,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class GameWindow extends JFrame {
     private CardLayout cardLayout;
@@ -17,10 +19,12 @@ public class GameWindow extends JFrame {
 
 
     private Character player;
+    private List<Supplier<Enemy>> enemyFactories;
     private List<Enemy> enemies;
     private int currentBattleIndex = 0;
     private BattleManager battleManager;
     private Round currentRound;
+    private ScoreSystem scoreSystem;
 
 
     private Timer questionTimer;
@@ -38,6 +42,9 @@ public class GameWindow extends JFrame {
     private JTextField txtFillBlank;
     private JButton btnConfirm;
 
+
+    private JLabel lblFinalTitle, lblFinalStats;
+
     public GameWindow() {
         setTitle("CodeArena RPG");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,6 +58,7 @@ public class GameWindow extends JFrame {
         mainPanel.add(createCharacterSelectPanel(), "CHAR_SELECT");
         mainPanel.add(createBattlePanel(), "BATTLE");
         mainPanel.add(createHowToPlayPanel(), "HOW_TO_PLAY");
+        mainPanel.add(createGameOverPanel(), "GAME_OVER");
 
         add(mainPanel);
         initEnemies();
@@ -90,9 +98,9 @@ public class GameWindow extends JFrame {
         panel.add(title, BorderLayout.NORTH);
 
         JPanel charsPanel = new JPanel(new GridLayout(1, 3, 15, 15));
-        charsPanel.add(createCharCard("Vampiro", new Vampire()));
-        charsPanel.add(createCharCard("Cartomante", new FortuneTeller()));
-        charsPanel.add(createCharCard("Bobo", new Fool()));
+        charsPanel.add(createCharCard("Vampiro", Vampire::new));
+        charsPanel.add(createCharCard("Cartomante", FortuneTeller::new));
+        charsPanel.add(createCharCard("Bobo", Fool::new));
         panel.add(charsPanel, BorderLayout.CENTER);
 
         JButton btnBack = new JButton("Voltar ao Menu");
@@ -102,15 +110,17 @@ public class GameWindow extends JFrame {
         return panel;
     }
 
-    private JPanel createCharCard(String name, Character characterInstance) {
+    private JPanel createCharCard(String name, Supplier<Character> characterFactory) {
         JPanel card = new JPanel(new BorderLayout(5, 5));
         card.setBorder(BorderFactory.createEtchedBorder());
 
+        Character previewInstance = characterFactory.get();
+
         String details = String.format(
                 "<html><center><b>%s</b><br><br>🩸 HP: %d<br>⚔ ATK: %d<br>🛡 DEF: %d<br>⚡ SPD: %d<br><br><i>%s</i></center></html>",
-                name, characterInstance.getMaxHealth(), characterInstance.getDamage(),
-                characterInstance.getSpeed(), characterInstance.getSpeed(),
-                (characterInstance instanceof SpecialAbility sa) ? sa.getAbilityDescription() : ""
+                name, previewInstance.getMaxHealth(), previewInstance.getDamage(),
+                previewInstance.getDefense(), previewInstance.getSpeed(),
+                (previewInstance instanceof SpecialAbility sa) ? sa.getAbilityDescription() : ""
         );
 
         JLabel lblInfo = new JLabel(details, SwingConstants.CENTER);
@@ -118,8 +128,10 @@ public class GameWindow extends JFrame {
 
         JButton btnSelect = new JButton("Escolher " + name);
         btnSelect.addActionListener(e -> {
-            this.player = characterInstance;
+            this.player = characterFactory.get();
             this.currentBattleIndex = 0;
+            this.scoreSystem = new ScoreSystem();
+            spawnFreshEnemies();
             startBattle();
         });
         card.add(btnSelect, BorderLayout.SOUTH);
@@ -212,10 +224,10 @@ public class GameWindow extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JTextArea helpText = new JTextArea("Como Jogar Arena Code RPG:\n\n" +
-                "1. Selecione seu herói e analise os atributos carregados do core principal.\n" +
-                "2. Utilize os botões para responder às questões técnicas apresentadas.\n" +
-                "3. Respeite o tempo limite exibido em tela para não sofrer penalidades automáticas.\n" +
-                "4. Expurgue todas as ondas de vírus sequenciais para vencer.");
+                "1. Selecione sua classe.\n" +
+                "2. Utilize os botões para responder às questões apresentadas.\n" +
+                "3. Preste atenção no tempo limite exibido em tela.\n" +
+                "4. Derrote todos os inimigos para vencer.");
         helpText.setEditable(false);
         helpText.setLineWrap(true);
         helpText.setWrapStyleWord(true);
@@ -224,6 +236,25 @@ public class GameWindow extends JFrame {
         JButton btnBack = new JButton("Voltar");
         btnBack.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
         panel.add(btnBack, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JPanel createGameOverPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(40, 80, 40, 80));
+
+        lblFinalTitle = new JLabel("Fim de Jogo", SwingConstants.CENTER);
+        lblFinalTitle.setFont(new Font("Arial", Font.BOLD, 26));
+        panel.add(lblFinalTitle, BorderLayout.NORTH);
+
+        lblFinalStats = new JLabel("", SwingConstants.CENTER);
+        lblFinalStats.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        panel.add(lblFinalStats, BorderLayout.CENTER);
+
+        JButton btnBackToMenu = new JButton("Voltar ao Menu");
+        btnBackToMenu.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
+        panel.add(btnBackToMenu, BorderLayout.SOUTH);
 
         return panel;
     }
@@ -242,7 +273,7 @@ public class GameWindow extends JFrame {
             selectedDifficulty = askFortuneTellerDifficulty();
         }
 
-        battleManager.PrepareQuestions(selectedDifficulty);
+        battleManager.prepareQuestions(selectedDifficulty);
         txtLog.setText("Combate iniciado contra: " + enemy.getName() + "!\n" + enemy.getEnemyDescription()+ "!\n");
 
         updateStatus();
@@ -252,8 +283,7 @@ public class GameWindow extends JFrame {
 
     private void nextBattle() {
         if (currentBattleIndex >= enemies.size()) {
-            JOptionPane.showMessageDialog(this, "PARABÉNS! Você venceu a CodeArena!");
-            cardLayout.show(mainPanel, "MENU");
+            showFinalScreen(true);
             return;
         }
 
@@ -265,7 +295,7 @@ public class GameWindow extends JFrame {
             selectedDifficulty = askFortuneTellerDifficulty();
         }
 
-        battleManager.PrepareQuestions(selectedDifficulty);
+        battleManager.prepareQuestions(selectedDifficulty);
         txtLog.append("\nNova ameaça: " + enemy.getName() + "\n" + enemy.getEnemyDescription() + "\n" );
 
         updateStatus();
@@ -278,12 +308,16 @@ public class GameWindow extends JFrame {
         stopTimer();
         if (battleManager == null) return;
 
+        Difficulty questionDifficulty = currentRound.getRoundQuestion().getDifficulty();
 
         Round.RoundResult playerResult = currentRound.executePlayerTurn(selectedAnswer);
         playerResult.logs.forEach(log -> txtLog.append(log + "\n"));
 
+        if (scoreSystem != null) {
+            scoreSystem.registerAnswer(playerResult.correct, questionDifficulty);
+        }
 
-        if (battleManager.getEnemy().IsAlive()) {
+        if (battleManager.getEnemy().isAlive()) {
             Round.RoundResult botResult = currentRound.executeBotTurn();
             botResult.logs.forEach(log -> txtLog.append(log + "\n"));
         }
@@ -298,24 +332,54 @@ public class GameWindow extends JFrame {
         BattleManager.BattleStatus status = battleManager.getBattleStatus();
 
         if (status == BattleManager.BattleStatus.ENEMY_WON) {
-            JOptionPane.showMessageDialog(this,
-                    "GAME OVER! Seu herói foi corrompido por " + battleManager.getEnemy().getName() + ".");
-            txtLog.setText("");
-            currentBattleIndex = 0;
-            cardLayout.show(mainPanel, "MENU");
+            showFinalScreen(false);
             return;
         }
 
         if (status == BattleManager.BattleStatus.PLAYER_WON) {
             txtLog.append("\n🏆 VITÓRIA! " + battleManager.getEnemy().getName() + " foi finalizado!\n");
+            if (scoreSystem != null) {
+                scoreSystem.registerEnemyDefeated();
+            }
             battleManager.applyPostBattleHeal();
-            JOptionPane.showMessageDialog(this, "Fim do combate! Cura passiva do herói executada.");
+            JOptionPane.showMessageDialog(this, "Fim do combate! Cura passiva executada.");
             currentBattleIndex++;
             nextBattle();
             return;
         }
 
         showNextQuestion();
+    }
+
+
+
+    private void showFinalScreen(boolean victory) {
+        stopTimer();
+
+        int totalScore = (scoreSystem != null) ? scoreSystem.getTotalScore() : 0;
+        int correct = (scoreSystem != null) ? scoreSystem.getCorrectAnswers() : 0;
+        int wrong = (scoreSystem != null) ? scoreSystem.getWrongAnswers() : 0;
+        int defeated = (scoreSystem != null) ? scoreSystem.getEnemiesDefeated() : 0;
+        double accuracy = (scoreSystem != null) ? scoreSystem.getAccuracyPercentage() : 0.0;
+
+        if (victory) {
+            lblFinalTitle.setText("🏆 VITÓRIA! Você é o campeão da CodeArena!");
+        } else {
+            String enemyName = (battleManager != null) ? battleManager.getEnemy().getName() : "um inimigo";
+            lblFinalTitle.setText("💀 GAME OVER! Derrotado por " + enemyName + ".");
+        }
+
+        String stats = String.format(
+                "<html><center>Pontuação final: <b>%d</b><br><br>" +
+                        "Inimigos derrotados: %d / %d<br>" +
+                        "Respostas certas: %d &nbsp;|&nbsp; Respostas erradas: %d<br>" +
+                        "Taxa de acerto: %.1f%%</center></html>",
+                totalScore, defeated, enemies.size(), correct, wrong, accuracy
+        );
+        lblFinalStats.setText(stats);
+
+        currentBattleIndex = 0;
+        cardLayout.show(mainPanel, "GAME_OVER");
     }
 
 
@@ -333,7 +397,7 @@ public class GameWindow extends JFrame {
 
         char eliminated = currentRound.getEliminatedOption();
         if (eliminated != 0) {
-            txtLog.append("[Cartomante] Alternativa [" + eliminated + "] é incorreta!\n");
+            txtLog.append("[" + player.getName() + "] Alternativa [" + eliminated + "] é incorreta!\n");
         }
 
         configureButtons(question);
@@ -400,11 +464,11 @@ public class GameWindow extends JFrame {
 
         lblPlayerHealth.setText(String.format("%s | HP: %d/%d | ATK: %d | DEF: %d",
                 player.getName(), player.getHealth(), player.getMaxHealth(),
-                player.getDamage(), player.getSpeed()));
+                player.getDamage(), player.getDefense()));
 
         lblEnemyHealth.setText(String.format("%s | HP: %d/%d | ATK: %d | DEF: %d",
                 enemy.getName(), enemy.getHealth(), enemy.getMaxHealth(),
-                enemy.getDamage(), enemy.getSpeed()));
+                enemy.getDamage(), enemy.getDefense()));
     }
 
     private Difficulty calculateDefaultDifficulty() {
@@ -427,13 +491,19 @@ public class GameWindow extends JFrame {
     }
 
     private void initEnemies() {
-        enemies = Arrays.asList(
-                new Enemy("Bloatware",  30,  30,  5,  1,  0, "Pré-instalado!"),
-                new Enemy("Adware",     60,  60, 10, 10,  0, "Temos ofertas para você!"),
-                new Enemy("Worm",      100, 100, 15, 15,  2, "Espalhando cópias..."),
-                new Enemy("Spyware",   150, 150,  8,  1,  5, "Observando..."),
-                new Enemy("Ransomware", 50,  50,  5,  1, 40, "Dados criptografados!"),
-                new Enemy("R.A.T.",    200, 200, 15, 15, 15, "Controle absoluto.")
+        enemyFactories = Arrays.asList(
+                () -> new Enemy("Bloatware",  30,  30,  5,  1,  0, "Pré-instalado!"),
+                () -> new Enemy("Adware",     60,  60, 10, 10,  5, "Temos ofertas para você!"),
+                () -> new Enemy("Worm",      120, 120, 20, 15,  10, "Espalhando cópias..."),
+                () -> new Enemy("Spyware",   200, 200,  15,  1,  10, "Observando..."),
+                () -> new Enemy("Ransomware", 50,  50,  5,  1, 40, "Dados criptografados!"),
+                () -> new Enemy("R.A.T.",    300, 300, 20, 20, 25, "Controle absoluto.")
         );
+    }
+
+    private void spawnFreshEnemies() {
+        enemies = enemyFactories.stream()
+                .map(Supplier::get)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

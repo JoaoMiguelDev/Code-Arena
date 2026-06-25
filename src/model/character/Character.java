@@ -1,60 +1,56 @@
 package model.character;
 
 public abstract class Character {
-    protected String Name;
-    protected int Health;
-    protected int MaxHealth;
-    protected int Damage;
-    protected int Speed;
-    protected int Defense;
+    protected String name;
+    protected int health;
+    protected int maxHealth;
+    protected int damage;
+    protected int speed;
+    protected int defense;
 
     public Character(String Name, int Health, int MaxHealth, int Damage, int Speed, int Defense){
-        this.Name = Name;
-        this.Health = Health;
-        this.MaxHealth = MaxHealth;
-        this.Damage = Damage;
-        this.Speed = Speed;
-        this.Defense = Defense;
+        this.name = Name;
+        this.health = Health;
+        this.maxHealth = MaxHealth;
+        this.damage = Damage;
+        this.speed = Speed;
+        this.defense = Defense;
     }
 
-    public int TakeDamage(int DamageReceived){
-        int DamageTaken = Math.max(0, DamageReceived - Defense);
-        this.Health = Math.max(0, this.Health - DamageTaken);
-        return DamageTaken; // Agora retorna o valor líquido exato calculado pelo modelo
+    public int takeDamage(int damageReceived){
+        int damageTaken = Math.max(0, damageReceived - defense);
+        this.health = Math.max(0, this.health - damageTaken);
+        return damageTaken;
     }
 
 
-    public void Heal(int Amount) {
-        this.Health = Math.min(this.Health + Amount, MaxHealth);
+    public void heal(int Amount) {
+        this.health = Math.min(this.health + Amount, maxHealth);
     }
 
-    public abstract void HealCharacter();
+    public abstract void healCharacter();
 
-    public void DisplayCharacterInfo(){
-        System.out.println(Name);
-        System.out.println("Health: " + Health+"/"+MaxHealth);
-        System.out.println("Damage: " + Damage);
-        System.out.println("Speed: " + Speed);
-        System.out.println("Defense: " + Defense);
-    }
-
-    public String getName() { return Name; }
+    public String getName() { return name; }
 
     public int getHealth() {
-        return Health;
+        return health;
     }
 
-    public int getMaxHealth() { return MaxHealth; }
+    public int getMaxHealth() { return maxHealth; }
 
     public int getSpeed() {
-        return Speed;
+        return speed;
     }
 
     public int getDamage() {
-        return Damage;
+        return damage;
     }
 
-    public boolean IsAlive(){
-        return Health > 0;
+    public int getDefense() {
+        return defense;
+    }
+
+    public boolean isAlive(){
+        return health > 0;
     }
 }

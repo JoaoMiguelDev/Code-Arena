@@ -3,19 +3,20 @@ package model.battle;
 import model.character.Character;
 import model.character.Enemy;
 import model.character.FortuneTeller;
+import model.character.SpecialAbility;
 import model.question.Difficulty;
 import model.question.Question;
 import model.question.QuestionBank;
 import java.util.*;
 
 public class BattleManager {
-    private int RoundIndex = 0;
-    private int RoundNumber = 1;
-    private Character Player;
-    private Enemy Enemy;
-    private List<Question> BattleQuestions;
+    private int roundIndex = 0;
+    private int roundNumber = 1;
+    private Character player;
+    private Enemy enemy;
+    private List<Question> battleQuestions;
     private QuestionBank questionBank;
-    private int BattleNumber;
+    private int battleNumber;
     private BattleStatus battleStatus;
 
     public enum BattleStatus {
@@ -23,62 +24,59 @@ public class BattleManager {
     }
 
     public BattleManager(Character player, Enemy enemy, int battleNumber) {
-        this.Player = player;
-        this.Enemy = enemy;
-        this.BattleNumber = battleNumber;
+        this.player = player;
+        this.enemy = enemy;
+        this.battleNumber = battleNumber;
         this.questionBank = new QuestionBank();
         this.battleStatus = BattleStatus.ONGOING;
     }
 
-    public void PrepareQuestions(Difficulty difficulty) {
-        BattleQuestions = questionBank.FilterByDifficulty(difficulty);
-        Collections.shuffle(BattleQuestions);
-        RoundIndex = 0;
+    public void prepareQuestions(Difficulty difficulty) {
+        battleQuestions = questionBank.FilterByDifficulty(difficulty);
+        Collections.shuffle(battleQuestions);
+        roundIndex = 0;
     }
 
-
-
-
     public Question getCurrentQuestion() {
-        if (BattleQuestions == null || BattleQuestions.isEmpty()) {
-            PrepareQuestions(Difficulty.EASY);
+        if (battleQuestions == null || battleQuestions.isEmpty()) {
+            prepareQuestions(Difficulty.EASY);
         }
-        if (RoundIndex >= BattleQuestions.size()) {
-            Collections.shuffle(BattleQuestions);
-            RoundIndex = 0;
+        if (roundIndex >= battleQuestions.size()) {
+            Collections.shuffle(battleQuestions);
+            roundIndex = 0;
         }
-        return BattleQuestions.get(RoundIndex);
+        return battleQuestions.get(roundIndex);
     }
 
 
     public Round buildCurrentRound() {
-        return new Round(RoundNumber, getCurrentQuestion(), Player, Enemy);
+        return new Round(roundNumber, getCurrentQuestion(), player, enemy);
     }
 
 
     public void advanceRound() {
-        RoundIndex++;
-        RoundNumber++;
+        roundIndex++;
+        roundNumber++;
     }
 
 
     public void refreshBattleStatus() {
-        if (!Player.IsAlive()) {
+        if (!player.isAlive()) {
             battleStatus = BattleStatus.ENEMY_WON;
-        } else if (!Enemy.IsAlive()) {
+        } else if (!enemy.isAlive()) {
             battleStatus = BattleStatus.PLAYER_WON;
         }
     }
 
     public boolean playerChoosesDifficulty() {
-        return Player instanceof FortuneTeller;
+        return player instanceof SpecialAbility sa && sa.choosesDifficulty();
     }
 
     public void applyPostBattleHeal() {
-        Player.HealCharacter();
+        player.healCharacter();
     }
 
     public BattleStatus getBattleStatus() { return battleStatus; }
-    public Character getPlayer() { return Player; }
-    public Enemy getEnemy() { return Enemy; }
+    public Character getPlayer() { return player; }
+    public Enemy getEnemy() { return enemy; }
 }

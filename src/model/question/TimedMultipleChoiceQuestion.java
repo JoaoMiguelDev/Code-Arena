@@ -11,18 +11,12 @@ public class TimedMultipleChoiceQuestion extends MultipleChoiceQuestion implemen
     }
 
     @Override
-    public void DisplayQuestion() {
-        System.out.println("\n⏱ Você tem " + timeLimitInSeconds + " segundos para responder!");
-        super.DisplayQuestion();
-    }
-
-    @Override
     public int getTimeLimitInSeconds() {
         return this.timeLimitInSeconds;
     }
 
     @Override
-    public boolean IsTimeUp(long elapsedTimeInSeconds) {
+    public boolean isTimeUp(long elapsedTimeInSeconds) {
         return elapsedTimeInSeconds > this.timeLimitInSeconds;
     }
 }

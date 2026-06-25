@@ -10,23 +10,13 @@ public class TrueFalseQuestion extends Question {
     }
 
     @Override
-    public void DisplayQuestion() {
-        System.out.println("\n" + Text);
-        System.out.println("─────────────────────────────────");
-        System.out.println("   A) Verdadeiro");
-        System.out.println("   B) Falso");
-        System.out.println("─────────────────────────────────");
-        System.out.print("Sua resposta (A ou B): ");
-    }
-
-    @Override
-    public boolean CheckAnswer(String answer){
+    public boolean checkAnswer(String answer){
         if (answer == null || answer.isEmpty()) {
             return false;
         }
 
         answer = answer.trim().toUpperCase();
-        boolean isCorrectTrue = this.CorrectAnswer.equals("Verdadeiro");
+        boolean isCorrectTrue = this.correctAnswer.equals("Verdadeiro");
 
         if (answer.equals("A") || answer.equals("VERDADEIRO") ||
                 answer.equals("TRUE") || answer.equals("V")) {
@@ -42,7 +32,7 @@ public class TrueFalseQuestion extends Question {
     }
 
     @Override
-    public List<String> GetAvailableAnswers() {
+    public List<String> getAvailableAnswers() {
         return List.of("A", "B");
     }
 }
