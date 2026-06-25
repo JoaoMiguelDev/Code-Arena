@@ -1,19 +1,19 @@
 package model.character;
 
 public class Enemy extends Character{
-    private String EnemyDescription;
+    private String enemyDescription;
 
-    public Enemy(String name, int health, int maxHealth, int damage, int speed, int defense, String EnemyDescription){
+    public Enemy(String name, int health, int maxHealth, int damage, int speed, int defense, String enemyDescription){
         super(name, health, maxHealth, damage, speed, defense);
-        this.EnemyDescription = EnemyDescription;
+        this.enemyDescription = enemyDescription;
     }
 
     @Override
-    public void HealCharacter() {
-        this.Heal(30);
+    public void healCharacter() {
+        this.heal(30);
     }
 
     public String getEnemyDescription(){
-        return EnemyDescription;
+        return enemyDescription;
     }
 }

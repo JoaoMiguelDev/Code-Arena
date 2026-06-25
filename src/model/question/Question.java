@@ -2,29 +2,28 @@ package model.question;
 import java.util.List;
 
 public abstract class Question {
-    protected String Text;
-    protected String CorrectAnswer;
-    protected Difficulty Difficulty;
+    protected String text;
+    protected String correctAnswer;
+    protected Difficulty difficulty;
 
     public Question(String text, String correctAnswer, Difficulty difficulty){
-        this.Text = text;
-        this.CorrectAnswer = correctAnswer;
-        this.Difficulty = difficulty;
+        this.text = text;
+        this.correctAnswer = correctAnswer;
+        this.difficulty = difficulty;
     }
 
     public String getText() {
-        return this.Text;
+        return this.text;
     }
 
     public Difficulty getDifficulty() {
-        return Difficulty;
+        return difficulty;
     }
 
     public String getCorrectAnswer() {
-        return CorrectAnswer;
+        return correctAnswer;
     }
 
-    public abstract void DisplayQuestion();
-    public abstract boolean CheckAnswer(String answer);
-    public abstract List<String> GetAvailableAnswers();
+    public abstract boolean checkAnswer(String answer);
+    public abstract List<String> getAvailableAnswers();
 }

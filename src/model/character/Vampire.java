@@ -8,8 +8,8 @@ public class Vampire extends Character implements SpecialAbility {
     }
 
     @Override
-    public void HealCharacter() {
-        this.Heal(30);
+    public void healCharacter() {
+        this.heal(5);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class Vampire extends Character implements SpecialAbility {
     @Override
     public void onAfterAnswer(Round roundContext, boolean isCorrect) {
         if (isCorrect) {
-            this.Heal(15);
+            this.heal(15);
         }
     }
 

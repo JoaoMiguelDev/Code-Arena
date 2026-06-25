@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Round {
-    private int RoundNumber;
-    private Question RoundQuestion;
-    private Character Player;
-    private Enemy Enemy;
-    private boolean PlayerWasCorrect;
+    private int roundNumber;
+    private Question roundQuestion;
+    private Character player;
+    private Enemy enemy;
+    private boolean playerWasCorrect;
     private BotAnswerer botAnswerer;
     private char eliminatedOption = 0;
 
@@ -30,94 +30,86 @@ public class Round {
     }
 
     public Round(int roundNumber, Question roundQuestion, Character player, Enemy enemy) {
-        this.RoundNumber = roundNumber;
-        this.RoundQuestion = roundQuestion;
-        this.Player = player;
-        this.Enemy = enemy;
+        this.roundNumber = roundNumber;
+        this.roundQuestion = roundQuestion;
+        this.player = player;
+        this.enemy = enemy;
         this.botAnswerer = new BotAnswerer();
     }
 
-
-
-
     public void preparePlayerTurn() {
         eliminatedOption = 0;
-        if (Player instanceof SpecialAbility sa) {
+        if (player instanceof SpecialAbility sa) {
             sa.onBeforeAnswer(this);
         }
-        if (Player instanceof SpecialAbility && RoundQuestion instanceof MultipleChoiceQuestion mcq) {
-            eliminatedOption = mcq.getIncorrectOption();
-        }
     }
 
 
-    public char getEliminatedOption() {
-        return eliminatedOption;
-    }
+    public char getEliminatedOption() {return eliminatedOption; }
+    public void setEliminatedOption(char option) { this.eliminatedOption = option;}
 
 
     public RoundResult executePlayerTurn(String answer) {
         List<String> logs = new ArrayList<>();
-        PlayerWasCorrect = RoundQuestion.CheckAnswer(answer);
+        playerWasCorrect = roundQuestion.checkAnswer(answer);
         int damage = 0;
 
-        if (PlayerWasCorrect) {
-            damage = CalculateBaseDamage(Player);
-            int net = Enemy.TakeDamage(damage);
-            logs.add("✅ Resposta CORRETA! Resposta: " + RoundQuestion.getCorrectAnswer());
-            logs.add("⚔️ Dano líquido causado ao " + Enemy.getName() + ": " + net);
+        if (playerWasCorrect) {
+            damage = CalculateBaseDamage(player);
+            int net = enemy.takeDamage(damage);
+            logs.add("✅ Resposta CORRETA! Resposta: " + roundQuestion.getCorrectAnswer());
+            logs.add("⚔️ Dano líquido causado ao " + enemy.getName() + ": " + net);
         } else {
-            logs.add("❌ Resposta INCORRETA! Correta era: " + RoundQuestion.getCorrectAnswer());
+            logs.add("❌ Resposta INCORRETA! Correta era: " + roundQuestion.getCorrectAnswer());
         }
 
 
-        if (Player instanceof SpecialAbility sa) {
-            int healthBefore = Player.getHealth();
-            sa.onAfterAnswer(this, PlayerWasCorrect);
-            int healthAfter = Player.getHealth();
+        if (player instanceof SpecialAbility sa) {
+            int healthBefore = player.getHealth();
+            sa.onAfterAnswer(this, playerWasCorrect);
+            int healthAfter = player.getHealth();
 
 
             if (healthAfter > healthBefore) {
-                logs.add("🩸 [" + Player.getName() + "] Recuperou " + (healthAfter - healthBefore) + " HP.");
+                logs.add("🩸 [" + player.getName() + "] Recuperou " + (healthAfter - healthBefore) + " HP.");
             }
 
-            if (!PlayerWasCorrect && Player instanceof Fool) {
-                int pityDamage = Player.getDamage() / 2;
-                logs.add("[Bobo] Palpite confuso! Dano de consolação: " + pityDamage);
+            int enemyHealthBefore = enemy.getHealth();
+            sa.onAfterAnswer(this, playerWasCorrect);
+            int enemyHealthAfter = enemy.getHealth();
+            if (!playerWasCorrect && enemyHealthAfter < enemyHealthBefore) {
+                logs.add("[" + player.getName() + "] Palpite confuso! ...");
             }
         }
 
-        return new RoundResult(PlayerWasCorrect, damage, logs);
+        return new RoundResult(playerWasCorrect, damage, logs);
     }
 
 
     public RoundResult executeBotTurn() {
         List<String> logs = new ArrayList<>();
-        logs.add("🤖 " + Enemy.getName() + " está processando a resposta...");
+        logs.add("🤖 " + enemy.getName() + " está processando a resposta...");
 
-        if (botAnswerer.getBotAnswer(RoundQuestion, Enemy)) {
-            int baseDamage = CalculateBaseDamage(Enemy);
+        if (botAnswerer.getBotAnswer(roundQuestion, enemy)) {
+            int baseDamage = CalculateBaseDamage(enemy);
 
-
-            if (Player instanceof Fool) {
-                baseDamage *= 2;
-                logs.add("[Bobo] O Bobo se atrapalhou e o dano foi duplicado!");
+            if (player instanceof SpecialAbility sa) {
+                baseDamage = sa.modifyIncomingDamage(baseDamage);
             }
 
-            int net = Player.TakeDamage(baseDamage);
-            logs.add("💥 " + Enemy.getName() + " acertou e causou " + net + " de dano líquido.");
+            int net = player.takeDamage(baseDamage);
+            logs.add("💥 " + enemy.getName() + " acertou e causou " + net + " de dano líquido.");
             return new RoundResult(true, net, logs);
         } else {
-            logs.add("✅ " + Enemy.getName() + " errou a resposta!");
+            logs.add("✅ " + enemy.getName() + " errou a resposta!");
             return new RoundResult(false, 0, logs);
         }
     }
 
     private int CalculateBaseDamage(Character character) {
-        return character.getDamage() * RoundQuestion.getDifficulty().getBaseDamage();
+        return character.getDamage() * roundQuestion.getDifficulty().getBaseDamage();
     }
 
-    public Character getEnemy() { return this.Enemy; }
-    public Question getRoundQuestion() { return this.RoundQuestion; }
-    public boolean wasPlayerCorrect() { return PlayerWasCorrect; }
+    public Character getEnemy() { return this.enemy; }
+    public Question getRoundQuestion() { return this.roundQuestion; }
 }
